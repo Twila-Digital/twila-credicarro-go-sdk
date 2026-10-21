@@ -186,7 +186,6 @@ func TestMessagesWithoutCodeOrTitle(t *testing.T) {
 }
 
 func TestMalformedProblemDetailsAreIgnored(t *testing.T) {
-	// "erros" como string em vez de lista: o corpo bruto continua disponível
 	err := getProposal(errorClient(t, http.StatusBadRequest, `{"tipo":"Validation.Field.Required","erros":"texto"}`, nil))
 	var validation *credicarro.ValidationError
 	if !errors.As(err, &validation) || validation.Body == "" {
@@ -197,7 +196,6 @@ func TestMalformedProblemDetailsAreIgnored(t *testing.T) {
 func TestNetworkFailureIsReturnedWithoutLeakingQueryString(t *testing.T) {
 	api := newFakeAPI(t, nil)
 	client := api.client(withResilience(func(r *credicarro.ResilienceOptions) { r.MaxRetryAttempts = 1 }))
-	// derruba o servidor depois de obter o token
 	if _, err := client.Simulations.GetFinancingRange(context.Background(), "ABC1D23", "11222333000181"); err == nil {
 		t.Fatal("esperava erro 404 do servidor sem rotas")
 	}

@@ -212,9 +212,6 @@ func (p *TokenProvider) GetToken(ctx context.Context) (string, error) {
 	if c == nil {
 		c = &call{done: make(chan struct{})}
 		p.inflight = c
-		// A renovação roda desacoplada do contexto de quem a disparou: se esse chamador
-		// cancelar, os demais que esperam o mesmo token não são afetados. Ela é limitada
-		// pelo timeout total do pipeline do cliente de token.
 		go p.refresh(c)
 	}
 	p.mu.Unlock()
@@ -251,7 +248,6 @@ func (p *TokenProvider) computeExpiry(resp wire.GenerateAccessTokenResponse) tim
 		}
 	}
 	if resp.ExpiresInS > 0 {
-		// validade = max(s/2, s-60): tokens curtos não são recusados de imediato.
 		lifetime := time.Duration(resp.ExpiresInS) * time.Second
 		margin := lifetime - ExpiryMargin
 		if half := lifetime / 2; half > margin {

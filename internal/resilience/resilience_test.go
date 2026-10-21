@@ -283,7 +283,6 @@ func TestCallerCancellationDoesNotCountAsFailureNorRetries(t *testing.T) {
 		}
 	}
 
-	// o circuit breaker não pode ter aberto por causa dos cancelamentos
 	resp, err := pipeline.Execute(context.Background(), true, isNetworkError, func(ctx context.Context) (resilience.Response, error) {
 		return resilience.Response{StatusCode: 200}, nil
 	})

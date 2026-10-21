@@ -13,8 +13,6 @@ import (
 // ociosas por host e TLS 1.2 no mínimo) e redirects desligados: um 3xx é devolvido como
 // resposta, sem reenviar o cabeçalho Authorization para outro destino.
 func New() *http.Client {
-	// Transporte montado do zero: não herda mutações globais do http.DefaultTransport
-	// (InsecureSkipVerify, proxy, dialer) feitas por outras bibliotecas do processo.
 	transport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{

@@ -71,8 +71,6 @@ func openAPI(t *testing.T) map[string]interface{} {
 	return spec
 }
 
-// ---------------------------------------------------------------- navegação no YAML
-
 func asMap(v interface{}) map[string]interface{} {
 	switch m := v.(type) {
 	case map[string]interface{}:
@@ -169,8 +167,6 @@ func parameterNames(root, op map[string]interface{}) map[string]bool {
 	return names
 }
 
-// ---------------------------------------------------------------- reflexão no wire
-
 type wireField struct {
 	name string
 	typ  reflect.Type
@@ -253,8 +249,6 @@ func checkRequired(t *testing.T, root map[string]interface{}, where string, typ 
 		}
 	}
 }
-
-// ---------------------------------------------------------------- tabela de operações
 
 type op struct {
 	method, path string

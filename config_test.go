@@ -50,7 +50,7 @@ func TestEnvironmentsResolveToDocumentedBaseURLs(t *testing.T) {
 		environment credicarro.Environment
 		expected    string
 	}{
-		{"", "https://api.credicarro.com.br/integration/"}, // padrão: produção
+		{"", "https://api.credicarro.com.br/integration/"},
 		{credicarro.EnvironmentProduction, "https://api.credicarro.com.br/integration/"},
 		{credicarro.EnvironmentStaging, "https://api.staging.credicarro.com.br/integration/"},
 	}

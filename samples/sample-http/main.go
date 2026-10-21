@@ -100,13 +100,11 @@ func (s *server) handleWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 1. Authorization (Basic/Jwt) cadastrado no webhook, comparado em tempo constante.
 	if s.webhookAuthorization != "" && !credicarro.VerifyWebhookAuthorization(r.Header.Get("Authorization"), s.webhookAuthorization) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// 2. Corpo bruto, limitado a 1 MiB, antes de qualquer desserialização.
 	r.Body = http.MaxBytesReader(w, r.Body, maxWebhookBodyBytes)
 	rawBody, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -118,14 +116,12 @@ func (s *server) handleWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 3. Assinatura HMAC (X-CrediCarro-Signature) com tolerância de 5 minutos (0 = padrão) e decodificação.
 	event, err := credicarro.ParseWebhookEvent(rawBody, r.Header.Get("X-CrediCarro-Signature"), s.webhookSecret, 0)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	// 4. Deduplicação pelo Idempotency-Key ({id_mensagem}:{id_webhook}, igual em todas as retentativas).
 	key := r.Header.Get("Idempotency-Key")
 	if key != "" {
 		if _, duplicate := s.seen.LoadOrStore(key, struct{}{}); duplicate {
@@ -134,7 +130,6 @@ func (s *server) handleWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// 5. Fila cheia: 503 na hora, desfazendo a deduplicação para a retentativa da Credicarro.
 	select {
 	case s.jobs <- webhookJob{ProposalID: event.ProposalID, IdempotencyKey: key}:
 		w.WriteHeader(http.StatusOK)
@@ -165,7 +160,7 @@ func (s *server) process(job webhookJob) {
 
 	proposal, err := s.client.Proposals.Get(ctx, job.ProposalID)
 	if err != nil {
-		log.Printf("webhook | Proposta: %s | Erro: %T", job.ProposalID, err) // sem payload nem dados pessoais
+		log.Printf("webhook | Proposta: %s | Erro: %T", job.ProposalID, err)
 		return
 	}
 	for _, action := range proposal.PendingActions() {

@@ -103,7 +103,6 @@ func TestSignatureRejectsTamperedBodySecretAndHeader(t *testing.T) {
 }
 
 func TestEmptySecretIsAlwaysInvalidEvenWithAMatchingSignature(t *testing.T) {
-	// HMAC com chave vazia é calculável; o SDK precisa recusar mesmo assim.
 	header := signedHeader("", time.Now().Unix(), docBody)
 	if credicarro.VerifyWebhookSignature([]byte(docBody), header, "", 0) {
 		t.Fatal("segredo vazio nunca deve validar")

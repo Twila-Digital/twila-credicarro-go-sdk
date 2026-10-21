@@ -5,11 +5,6 @@ import (
 	"unicode"
 )
 
-// Os tipos que carregam CPF, e-mail, celular, renda, conta bancária, credencial, segredo
-// ou conteúdo de documento implementam String() e GoString() com esses valores mascarados:
-// CPF vira ***.456.789-** e os demais campos sensíveis viram ***. Assim, %v, %+v, %#v e
-// fmt.Print nunca vazam dados pessoais em logs.
-
 const masked = "***"
 
 // maskCPF mostra só os dígitos centrais de um CPF de 11 dígitos (***.456.789-**).

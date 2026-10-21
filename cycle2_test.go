@@ -24,7 +24,7 @@ func TestTokenEndpointStatusMapping(t *testing.T) {
 			api := newFakeAPI(t, okProposal)
 			api.tokenHandler = func(w http.ResponseWriter, r *http.Request, n int) {
 				if c.status >= 300 && c.status < 400 {
-					w.Header().Set("Location", "http://127.0.0.1:1/destino") // um 3xx real sempre traz Location
+					w.Header().Set("Location", "http://127.0.0.1:1/destino")
 				}
 				writeRaw(w, c.status, `{"tipo":"Token.Falha","titulo":"Falha"}`)
 			}
@@ -47,7 +47,7 @@ func TestTokenEndpointStatusMapping(t *testing.T) {
 func TestNetworkBackoffNeverExceedsTheRemainingBudget(t *testing.T) {
 	api := newFakeAPI(t, okProposal)
 	client := api.client(withResilience(func(r *credicarro.ResilienceOptions) {
-		r.RetryBaseDelay = 30 * time.Second // backoff enorme
+		r.RetryBaseDelay = 30 * time.Second
 		r.TotalTimeout = 400 * time.Millisecond
 		r.AttemptTimeout = 200 * time.Millisecond
 	}))
@@ -95,7 +95,7 @@ func TestJSONMarshalCarriesRealValuesWhileFormattingIsMasked(t *testing.T) {
 			t.Errorf("%T: json.Marshal deveria trazer %q (err=%v): %s", c.value, c.want, err, data)
 		}
 		if c.want == "6500" {
-			continue // número comum pode aparecer em outro campo; renda mascarada é coberta em outro teste
+			continue
 		}
 		if text := fmt.Sprintf("%v %+v %#v", c.value, c.value, c.value); strings.Contains(text, c.want) {
 			t.Errorf("%T: a formatação não pode trazer %q: %s", c.value, c.want, text)

@@ -98,7 +98,6 @@ func authenticationErrorFromTokenFailure(authErr *auth.Error) error {
 	switch authErr.Kind {
 	case auth.KindRejected:
 		apiErr := apiErrorFromHTTP(authErr.Response)
-		// Só 400 e 401 são falha de credencial; 3xx e demais status são erros da API.
 		if apiErr.StatusCode != http.StatusBadRequest && apiErr.StatusCode != http.StatusUnauthorized {
 			return apiErr
 		}
@@ -138,7 +137,6 @@ func translateExecutorError(ctx context.Context, err error) error {
 		return exceptionFromHTTPError(httpErr)
 	}
 
-	// Cancelamento/expiração do contexto do chamador é devolvido como está.
 	if ctxErr := ctx.Err(); ctxErr != nil {
 		return ctxErr
 	}

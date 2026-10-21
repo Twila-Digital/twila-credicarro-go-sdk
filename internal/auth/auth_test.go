@@ -71,7 +71,6 @@ func TestTokenIsCachedUntilExpiry(t *testing.T) {
 		t.Fatalf("esperava 1 geração de token, veio %d", gen.callCount())
 	}
 
-	// expira_em_segundos 3600 com margem de 60 s: vale por 3540 s.
 	clk.advance(3539 * time.Second)
 	if _, err := provider.GetToken(context.Background()); err != nil || gen.callCount() != 1 {
 		t.Fatalf("o token ainda deveria valer (calls=%d, err=%v)", gen.callCount(), err)
@@ -157,7 +156,6 @@ func TestWaiterRespectsItsOwnContextWhileRefreshContinues(t *testing.T) {
 		t.Fatal("o chamador deveria ter saído assim que o contexto expirou")
 	}
 
-	// A renovação não foi abortada: o próximo chamador aproveita a mesma requisição.
 	done := make(chan string, 1)
 	go func() {
 		token, _ := provider.GetToken(context.Background())
@@ -210,7 +208,6 @@ func TestInvalidateOnlyDropsTheRejectedToken(t *testing.T) {
 		t.Fatalf("esperava renovação para new, veio %q (calls=%d)", second, gen.callCount())
 	}
 
-	// Uma segunda goroutine ainda tem o token antigo rejeitado: não pode derrubar o novo.
 	provider.Invalidate("old")
 	again, _ := provider.GetToken(context.Background())
 	if again != "new" || gen.callCount() != 2 {

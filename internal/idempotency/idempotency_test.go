@@ -23,7 +23,6 @@ func TestRequiresKey(t *testing.T) {
 		{"POST", "v1/proposal", true},
 		{"POST", "v2/proposal", true},
 		{"POST", "v2/proposal/" + id + "/document", true},
-		// a chave NUNCA é automática no unified: com ela a rota só cria
 		{"POST", "v1/customer/unified", false},
 		{"POST", "v1/webhook", false},
 		{"POST", "v1/authentication/accesstoken", false},
@@ -61,11 +60,9 @@ func TestIsRetrySafe(t *testing.T) {
 		{"POST", "v1/authentication/accesstoken", false, true},
 		{"POST", "v1/customer", true, true},
 		{"POST", "v1/customer", false, false},
-		// unified: só é repetível quando o integrador informou a chave
 		{"POST", "v1/customer/unified", true, true},
 		{"POST", "v1/customer/unified", false, false},
 		{"POST", "v2/proposal/" + id + "/document", true, true},
-		// substituição: repetível mesmo sem chave
 		{"POST", "v2/proposal/" + id + "/vehicle-detail", false, true},
 		{"POST", "v2/proposal/" + id + "/deposit-account", false, true},
 		{"POST", "v1/webhook", false, false},

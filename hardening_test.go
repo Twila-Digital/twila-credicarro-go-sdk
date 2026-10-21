@@ -128,7 +128,7 @@ func TestInjectedHTTPClientKeepsTransportButForcesNoRedirects(t *testing.T) {
 	counter := &countingTransport{base: http.DefaultTransport}
 	injected := &http.Client{
 		Transport:     counter,
-		CheckRedirect: func(*http.Request, []*http.Request) error { return nil }, // tentaria seguir
+		CheckRedirect: func(*http.Request, []*http.Request) error { return nil },
 	}
 	client := api.client(func(o *credicarro.ClientOptions) { o.HTTPClient = injected })
 
@@ -239,7 +239,7 @@ func TestDocumentUploadBudgetIsAttemptTimeoutTimesMaxAttempts(t *testing.T) {
 	client := api.client(withResilience(func(r *credicarro.ResilienceOptions) {
 		r.TotalTimeout = 300 * time.Millisecond
 		r.AttemptTimeout = 200 * time.Millisecond
-		r.DocumentUploadAttemptTimeout = 400 * time.Millisecond // orçamento: 3 × 400 ms
+		r.DocumentUploadAttemptTimeout = 400 * time.Millisecond
 	}))
 
 	file, _ := credicarro.NewDocumentFileFromBytes([]byte("x"), "a.pdf")

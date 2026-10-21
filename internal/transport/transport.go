@@ -107,8 +107,6 @@ func EnsureSuccess(resp RawResponse) error {
 }
 
 func (e *Executor) send(ctx context.Context, method, path string, body interface{}, opts RequestOptions) (RawResponse, error) {
-	// A chave é decidida UMA vez por chamada lógica — fora do pipeline de retry — para
-	// que todas as tentativas (e o replay após 401) usem exatamente a mesma.
 	idempotencyKey := opts.IdempotencyKey
 	if idempotencyKey == "" && method == http.MethodPost {
 		auto := !e.disableAutoIdempotency && idempotency.RequiresKey(method, path)
@@ -126,8 +124,6 @@ func (e *Executor) send(ctx context.Context, method, path string, body interface
 	if attemptTimeout <= 0 {
 		attemptTimeout = e.attemptTimeout
 	}
-	// Orçamento total: TotalTimeout; no envio de documento (tentativa própria, mais longa),
-	// tentativa × número máximo de tentativas.
 	total := e.totalTimeout
 	if opts.AttemptTimeout > 0 {
 		total = opts.AttemptTimeout * time.Duration(e.maxAttempts)
@@ -183,9 +179,6 @@ func (e *Executor) sendWithAuth(ctx context.Context, method, path string, body [
 }
 
 func (e *Executor) sendOnce(ctx context.Context, method, path string, body []byte, idempotencyKey string, attemptTimeout time.Duration, token string) (RawResponse, error) {
-	// baseURL sempre termina com "/" (garantido na resolução de ClientOptions) e path nunca
-	// começa com "/" — concatenação direta evita a armadilha de resolução de URI relativa
-	// que descartaria o segmento "integration" da base URL.
 	fullURL := e.baseURL + path
 
 	attemptCtx := ctx

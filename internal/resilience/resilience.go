@@ -191,8 +191,6 @@ func (p *Pipeline) ExecuteWithTotal(ctx context.Context, total time.Duration, re
 		resp, err := p.runAttempt(ctx, deadline, attempt)
 
 		if err != nil {
-			// Cancelamento/expiração do contexto do chamador, ou um erro que não é de
-			// rede, não é falha do serviço: não conta pro circuit breaker nem é repetido.
 			if ctx.Err() != nil || !isNetworkError(err) {
 				p.breaker.onAbort()
 				return Response{}, err
@@ -234,8 +232,6 @@ func (p *Pipeline) ExecuteWithTotal(ctx context.Context, total time.Duration, re
 			return resp, nil
 		}
 
-		// Retry-After maior que o orçamento restante: não espera, devolve já a resposta
-		// (o chamador recebe o 429/503 com o RetryAfter).
 		if resp.RetryAfter > remaining {
 			return resp, nil
 		}
@@ -250,7 +246,6 @@ func (p *Pipeline) ExecuteWithTotal(ctx context.Context, total time.Duration, re
 		}
 	}
 
-	// inatingível: o loop sempre retorna ou dá continue até esgotar maxAttempts.
 	return Response{}, lastErr
 }
 

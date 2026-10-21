@@ -4,10 +4,6 @@ import (
 	"strings"
 )
 
-// Todos os enums de resposta têm o fallback XxxUnknown (-1): um valor que o SDK ainda
-// não conhece nunca gera erro; o valor bruto fica nos campos XxxRaw / XxxName dos tipos
-// que usam o enum.
-
 // ProposalStatus é o status da proposta (enum_status / status).
 type ProposalStatus int
 

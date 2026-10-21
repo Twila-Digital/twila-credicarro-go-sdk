@@ -6,7 +6,6 @@
 // público; por isso cada tipo de requisição/resposta carrega só os campos do schema.
 package wire
 
-// Os DTOs espelham o JSON da API campo a campo (o openapi.yaml documenta cada um) e não são API pública.
 //revive:disable:exported
 
 // ProblemDetails é o corpo de erro padrão da API (campos em português).
@@ -44,8 +43,6 @@ type Page struct {
 	Total       int64 `json:"total"`
 }
 
-// ---------------------------------------------------------------- autenticação
-
 type GenerateAccessTokenRequest struct {
 	ClientID     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
@@ -58,8 +55,6 @@ type GenerateAccessTokenResponse struct {
 	ExpiresAt  string `json:"expira_em"`
 	Scope      string `json:"escopo"`
 }
-
-// -------------------------------------------------------------------- clientes
 
 type Address struct {
 	Street       string `json:"rua"`
@@ -110,8 +105,6 @@ type CustomerProfessionalRequest struct {
 type CustomerIDResponse struct {
 	CustomerID string `json:"id_cliente"`
 }
-
-// ------------------------------------------------------------------ simulações
 
 type FinancingRangeOption struct {
 	Term               int     `json:"prazo"`
@@ -254,8 +247,6 @@ type PagedSimulations struct {
 	Page  Page         `json:"pagina"`
 }
 
-// ------------------------------------------------------------------- propostas
-
 type CreateProposalRequest struct {
 	Cpf          string `json:"cpf"`
 	SimulationID string `json:"simulacaoId"`
@@ -365,8 +356,6 @@ type PagedProposals struct {
 	Items []ProposalV1 `json:"itens"`
 	Page  Page         `json:"pagina"`
 }
-
-// ------------------------------------------------------------------- webhooks
 
 type CreateWebhookRequest struct {
 	Type               int    `json:"tipo"`

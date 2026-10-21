@@ -83,8 +83,6 @@ func main() {
 	}
 
 	driver["rules"] = mergedRules
-	// O Code Scanning identifica a análise pelo nome da ferramenta: sem um nome fixo, ele mudaria conforme a ordem das
-	// runs do Codacy (Opengrep, Revive...) e os alertas da análise anterior ficariam abertos para sempre.
 	driver["name"] = "Codacy"
 	first["results"] = results
 	sarif["runs"] = []interface{}{first}

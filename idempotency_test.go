@@ -326,7 +326,7 @@ func TestGetIsRetriedOnTransientStatusesAndNeverOnOther4xx(t *testing.T) {
 			_, _ = client.V1.Proposals.Get(context.Background(), testUUID)
 			expected := 1
 			if status == 401 {
-				expected = 2 // original + replay após renovar o token
+				expected = 2
 			}
 			if len(api.recorded()) != expected {
 				t.Fatalf("status %d: esperava %d requisições, veio %d", status, expected, len(api.recorded()))

@@ -31,7 +31,7 @@ func fastResilienceOptions() credicarro.ResilienceOptions {
 		RetryBaseDelay:               time.Millisecond,
 		CircuitBreakerFailureRatio:   0.5,
 		CircuitBreakerSamplingWindow: 30 * time.Second,
-		CircuitBreakerMinThroughput:  1000, // alto o bastante pra não abrir sozinho durante os testes
+		CircuitBreakerMinThroughput:  1000,
 		CircuitBreakerBreakDuration:  time.Second,
 		RetryOn500:                   true,
 	}

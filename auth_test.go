@@ -61,7 +61,6 @@ func TestTokenRequestCarriesCredentialsOnly(t *testing.T) {
 func TestExpiredTokenIsRenewedBeforeTheNextCall(t *testing.T) {
 	api := newFakeAPI(t, okProposal)
 	api.tokenHandler = func(w http.ResponseWriter, r *http.Request, n int) {
-		// expira_em já no passado: o SDK precisa renovar a cada chamada
 		writeJSON(w, http.StatusOK, map[string]interface{}{
 			"token_de_acesso": "t" + string(rune('0'+n)), "expira_em_segundos": 3600, "expira_em": "2020-01-01T00:00:00+00:00",
 		})
@@ -85,7 +84,7 @@ func TestExpiredTokenIsRenewedBeforeTheNextCall(t *testing.T) {
 func TestRefreshesTokenAndRetriesOnceOn401KeepingTheIdempotencyKey(t *testing.T) {
 	api := newFakeAPI(t, func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") == "Bearer stale-token" {
-			w.WriteHeader(http.StatusUnauthorized) // 401 sem corpo, como a API faz
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		writeRaw(w, http.StatusCreated, `{"id_proposta":"`+testUUID+`"}`)
