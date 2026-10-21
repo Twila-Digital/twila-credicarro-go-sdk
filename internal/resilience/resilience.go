@@ -5,8 +5,9 @@ package resilience
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/binary"
 	"errors"
-	"math/rand"
 	"sync"
 	"time"
 )
@@ -284,8 +285,18 @@ func (p *Pipeline) backoff(attemptNumber int) time.Duration {
 	}
 	base := float64(p.opts.RetryBaseDelay)
 	exponential := base * float64(int64(1)<<uint(exponent))
-	jitter := 0.5 + rand.Float64()
+	jitter := 0.5 + jitterFraction()
 	return time.Duration(exponential * jitter)
+}
+
+// jitterFraction devolve um valor uniforme em [0, 1) lido do crypto/rand. O math/rand global não é semeado antes
+// do Go 1.20, o que faria todos os processos esperarem o mesmo tempo entre as tentativas.
+func jitterFraction() float64 {
+	var b [8]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		return 0.5
+	}
+	return float64(binary.BigEndian.Uint64(b[:])>>11) / (1 << 53)
 }
 
 func sleep(ctx context.Context, d time.Duration) {
