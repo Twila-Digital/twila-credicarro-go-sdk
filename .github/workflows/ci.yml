@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [production]
+  pull_request:
+    branches: [production]
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27'
+
+      - run: go build ./...
+      - run: go vet ./...
+
+      - name: samples e contract tests compilam
+        run: |
+          for dir in samples/sample-cli samples/sample-http; do
+            (cd "$dir" && go build ./...)
+          done
+          (cd contract-tests && go vet ./...)
+
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "Arquivos não formatados (rode gofmt -w .):"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.13.2
+
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ['1.18', '1.20', '1.21', '1.22', '1.23', '1.24', '1.25', '1.26', '1.27']
+        os: [ubuntu-latest]
+        include:
+          - go-version: '1.27'
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - run: go test ./... -race -coverprofile=coverage.out -covermode=atomic
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.27'
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.out
+          fail_ci_if_error: false

@@ -1,0 +1,4 @@
+exclude_paths:
+  - "samples/**"
+  - "contract-tests/**"
+  - "**/*_test.go"
