@@ -179,13 +179,13 @@ func proposalDetailsFromWire(w wire.ProposalV2) ProposalDetails {
 type PendingActionKind string
 
 const (
-	// PendingActionSendDocuments: enviar os documentos pendentes (etapa ENVIO_DOCUMENTOS).
+	// PendingActionSendDocuments — enviar os documentos pendentes (etapa ENVIO_DOCUMENTOS).
 	PendingActionSendDocuments PendingActionKind = "SendDocuments"
-	// PendingActionCorrectDocuments: reenviar os documentos recusados (etapa CORRECAO_DOCUMENTOS).
+	// PendingActionCorrectDocuments — reenviar os documentos recusados (etapa CORRECAO_DOCUMENTOS).
 	PendingActionCorrectDocuments PendingActionKind = "CorrectDocuments"
-	// PendingActionSendVehicleDetails: enviar os dados do veículo (etapa DADOS_VEICULO).
+	// PendingActionSendVehicleDetails — enviar os dados do veículo (etapa DADOS_VEICULO).
 	PendingActionSendVehicleDetails PendingActionKind = "SendVehicleDetails"
-	// PendingActionSendDepositAccount: enviar a conta de recebimento (etapa CONTA_RECEBIMENTO).
+	// PendingActionSendDepositAccount — enviar a conta de recebimento (etapa CONTA_RECEBIMENTO).
 	PendingActionSendDepositAccount PendingActionKind = "SendDepositAccount"
 )
 

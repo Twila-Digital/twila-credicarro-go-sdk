@@ -6,6 +6,9 @@
 // público; por isso cada tipo de requisição/resposta carrega só os campos do schema.
 package wire
 
+// Os DTOs espelham o JSON da API campo a campo (o openapi.yaml documenta cada um) e não são API pública.
+//revive:disable:exported
+
 // ProblemDetails é o corpo de erro padrão da API (campos em português).
 type ProblemDetails struct {
 	Type   string         `json:"tipo,omitempty"`

@@ -11,6 +11,7 @@ import (
 // ProposalStatus é o status da proposta (enum_status / status).
 type ProposalStatus int
 
+// Valores de ProposalStatus.
 const (
 	ProposalStatusUnknown        ProposalStatus = -1
 	ProposalStatusAnalysing      ProposalStatus = 1 // EM_ANALISE / Analysing
@@ -63,6 +64,7 @@ func proposalStatusFromName(name string) ProposalStatus {
 // ProposalType é a modalidade da proposta.
 type ProposalType int
 
+// Valores de ProposalType.
 const (
 	ProposalTypeUnknown     ProposalType = -1
 	ProposalTypeFinancing   ProposalType = 1
@@ -83,6 +85,7 @@ func proposalTypeFromName(name string) ProposalType {
 // SimulationType é o tipo da simulação (campo "tipo" de SimulationResponse).
 type SimulationType int
 
+// Valores de SimulationType.
 const (
 	SimulationTypeUnknown          SimulationType = -1
 	SimulationTypeFinancing        SimulationType = 1
@@ -106,6 +109,7 @@ func simulationTypeFromName(name string) SimulationType {
 // ProposalStep é a etapa de um participante da proposta (enum_etapa / etapa).
 type ProposalStep int
 
+// Valores de ProposalStep.
 const (
 	ProposalStepUnknown            ProposalStep = -1
 	ProposalStepUndefined          ProposalStep = 0  // INDEFINIDO
@@ -133,6 +137,7 @@ func proposalStepFromInt(raw int) ProposalStep {
 // StepSituation é a situação da etapa (enum_situacao / situacao).
 type StepSituation int
 
+// Valores de StepSituation.
 const (
 	StepSituationUnknown            StepSituation = -1
 	StepSituationAwaitingSubmission StepSituation = 1 // AGUARDANDO_ENVIO
@@ -154,6 +159,7 @@ func stepSituationFromInt(raw int) StepSituation {
 // ActionOwner é quem precisa agir na etapa (enum_responsavel_acao / responsavel_acao).
 type ActionOwner int
 
+// Valores de ActionOwner.
 const (
 	ActionOwnerUnknown    ActionOwner = -1
 	ActionOwnerNone       ActionOwner = 0 // NENHUM
@@ -172,6 +178,7 @@ func actionOwnerFromInt(raw int) ActionOwner {
 // BiometryStatus é a situação da biometria (enum_biometria / biometria).
 type BiometryStatus int
 
+// Valores de BiometryStatus.
 const (
 	BiometryStatusUnknown        BiometryStatus = -1
 	BiometryStatusNotStarted     BiometryStatus = 0 // NAO_INICIADA
@@ -191,6 +198,7 @@ func biometryStatusFromInt(raw int) BiometryStatus {
 // DocumentStatus é o status de um documento da proposta (enum_status dentro de documentos).
 type DocumentStatus int
 
+// Valores de DocumentStatus.
 const (
 	DocumentStatusUnknown    DocumentStatus = -1
 	DocumentStatusReceived   DocumentStatus = 0 // RECEBIDO
@@ -211,6 +219,7 @@ func documentStatusFromInt(raw int) DocumentStatus {
 // DocumentType é o tipo de documento (código tipoDocumento no envio; enum_tipo na consulta).
 type DocumentType int
 
+// Valores de DocumentType.
 const (
 	DocumentTypeUnknown          DocumentType = -1
 	DocumentTypeCnh              DocumentType = 1
@@ -240,6 +249,7 @@ func documentTypeFromInt(raw int) DocumentType {
 // ProposalEventReason é o motivo do evento de webhook (motivo_evento).
 type ProposalEventReason int
 
+// Valores de ProposalEventReason.
 const (
 	ProposalEventReasonUnknown          ProposalEventReason = -1
 	ProposalEventReasonStatusChanged    ProposalEventReason = 1 // STATUS_ALTERADO
@@ -263,6 +273,7 @@ func proposalEventReasonFromName(name string) ProposalEventReason {
 // OccupationType é o tipo de ocupação do cliente (tipoOcupacao). Valores de requisição.
 type OccupationType int
 
+// Valores de OccupationType.
 const (
 	OccupationTypeRetired       OccupationType = 1
 	OccupationTypePensioner     OccupationType = 2
@@ -275,6 +286,7 @@ const (
 // DepositAccountType é o tipo da conta de recebimento (tipoConta). Valores de requisição.
 type DepositAccountType string
 
+// Valores de DepositAccountType.
 const (
 	DepositAccountTypeChecking DepositAccountType = "CORRENTE"
 	DepositAccountTypeSavings  DepositAccountType = "POUPANCA"
@@ -284,6 +296,7 @@ const (
 // ProposalParticipant é o participante dono do documento enviado (participante).
 type ProposalParticipant string
 
+// Valores de ProposalParticipant.
 const (
 	ProposalParticipantBuyer  ProposalParticipant = "COMPRADOR"
 	ProposalParticipantSeller ProposalParticipant = "VENDEDOR"
@@ -293,6 +306,7 @@ const (
 // WebhookType é o evento notificado pelo webhook (tipo).
 type WebhookType int
 
+// Valores de WebhookType.
 const (
 	WebhookTypeUnknown    WebhookType = -1
 	WebhookTypeCustomer   WebhookType = 1
@@ -316,6 +330,7 @@ func webhookTypeFromText(text string) WebhookType {
 // WebhookAuthenticationType é a autenticação que a Credicarro envia ao chamar a URL (tipo_autenticacao).
 type WebhookAuthenticationType int
 
+// Valores de WebhookAuthenticationType.
 const (
 	WebhookAuthenticationTypeUnknown WebhookAuthenticationType = -1
 	WebhookAuthenticationTypeNone    WebhookAuthenticationType = 1
@@ -339,6 +354,7 @@ func webhookAuthenticationTypeFromText(text string) WebhookAuthenticationType {
 // WebhookStatus é o status do webhook (status).
 type WebhookStatus int
 
+// Valores de WebhookStatus.
 const (
 	WebhookStatusUnknown  WebhookStatus = -1
 	WebhookStatusActive   WebhookStatus = 1

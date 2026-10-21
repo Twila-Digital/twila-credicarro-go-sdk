@@ -153,6 +153,7 @@ type Pipeline struct {
 	breaker *circuitBreaker
 }
 
+// NewPipeline cria o pipeline com as opções de retry e circuit breaker.
 func NewPipeline(opts Options) *Pipeline {
 	return &Pipeline{opts: opts, breaker: newCircuitBreaker(opts)}
 }

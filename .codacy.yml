@@ -1,4 +1,16 @@
 exclude_paths:
   - "samples/**"
   - "contract-tests/**"
+  - "*_test.go"
   - "**/*_test.go"
+  - "go.mod"
+  - "go.sum"
+engines:
+  # O deadcode do Codacy analisa arquivo por arquivo com um parser sem genéricos (Go 1.18+).
+  deadcode:
+    exclude_paths:
+      - "paged_result.go"
+  # Nota de layout do aligncheck no circuitBreaker: há uma instância por client, então 8 bytes de padding não pesam.
+  aligncheck:
+    exclude_paths:
+      - "internal/resilience/resilience.go"

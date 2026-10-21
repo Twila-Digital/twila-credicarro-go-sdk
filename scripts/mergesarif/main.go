@@ -33,8 +33,8 @@ func main() {
 	}
 
 	runs, _ := sarif["runs"].([]interface{})
-	if len(runs) <= 1 {
-		fmt.Printf("[mergesarif] %s já tem %d run(s), nada a fazer.\n", path, len(runs))
+	if len(runs) == 0 {
+		fmt.Printf("[mergesarif] %s não tem runs, nada a fazer.\n", path)
 		return
 	}
 
@@ -83,6 +83,9 @@ func main() {
 	}
 
 	driver["rules"] = mergedRules
+	// O Code Scanning identifica a análise pelo nome da ferramenta: sem um nome fixo, ele mudaria conforme a ordem das
+	// runs do Codacy (Opengrep, Revive...) e os alertas da análise anterior ficariam abertos para sempre.
+	driver["name"] = "Codacy"
 	first["results"] = results
 	sarif["runs"] = []interface{}{first}
 

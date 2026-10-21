@@ -39,7 +39,7 @@ go get github.com/Twila-Digital/twila-credicarro-go-sdk@<commit-sha>
 
 Ou, num checkout local, use uma diretiva `replace` no seu `go.mod`:
 
-```
+```text
 replace github.com/Twila-Digital/twila-credicarro-go-sdk => /caminho/local/twila-credicarro-go-sdk
 ```
 

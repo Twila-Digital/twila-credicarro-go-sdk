@@ -34,8 +34,8 @@ Este Código de Conduta se aplica a todos os espaços da comunidade do projeto, 
 
 ## Aplicação
 
-Casos de comportamento abusivo, de assédio ou de outra forma inaceitável podem ser reportados aos mantenedores responsáveis pelo cumprimento em oss@twila.digital. Todas as reclamações serão analisadas e investigadas prontamente e de forma justa.
+Casos de comportamento abusivo, de assédio ou de outra forma inaceitável podem ser reportados aos mantenedores responsáveis pelo cumprimento em <oss@twila.digital>. Todas as reclamações serão analisadas e investigadas prontamente e de forma justa.
 
 ## Atribuição
 
-Este Código de Conduta é adaptado do [Contributor Covenant](https://www.contributor-covenant.org), versão 2.1, disponível em https://www.contributor-covenant.org/version/2/1/code_of_conduct.html.
+Este Código de Conduta é adaptado do [Contributor Covenant](https://www.contributor-covenant.org), versão 2.1, disponível em <https://www.contributor-covenant.org/version/2/1/code_of_conduct.html>.

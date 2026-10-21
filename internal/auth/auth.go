@@ -21,11 +21,11 @@ import (
 type Kind int
 
 const (
-	// KindRejected: a API respondeu com status não-2xx (401 credenciais inválidas, 400...).
+	// KindRejected — a API respondeu com status não-2xx (401 credenciais inválidas, 400...).
 	KindRejected Kind = iota + 1
-	// KindNetwork: falha de transporte (rede, DNS, timeout de tentativa) ao chamar a API.
+	// KindNetwork — falha de transporte (rede, DNS, timeout de tentativa) ao chamar a API.
 	KindNetwork
-	// KindEmptyResponse: resposta 2xx sem corpo válido ou sem token_de_acesso.
+	// KindEmptyResponse — resposta 2xx sem corpo válido ou sem token_de_acesso.
 	KindEmptyResponse
 )
 
