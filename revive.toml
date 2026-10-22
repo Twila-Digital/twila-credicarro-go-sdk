@@ -1,0 +1,28 @@
+# Regras padrão do revive (as mesmas do golint), sem package-comments: o Codacy analisa arquivo por arquivo e
+# cobraria o comentário de pacote em cada arquivo; ele fica no arquivo principal de cada pacote, como o godoc espera.
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.8
+
+[rule.blank-imports]
+[rule.context-as-argument]
+[rule.context-keys-type]
+[rule.dot-imports]
+[rule.error-return]
+[rule.error-strings]
+[rule.error-naming]
+[rule.exported]
+[rule.increment-decrement]
+[rule.var-naming]
+[rule.var-declaration]
+[rule.range]
+[rule.receiver-naming]
+[rule.time-naming]
+[rule.unexported-return]
+[rule.indent-error-flow]
+[rule.errorf]
+[rule.empty-block]
+[rule.superfluous-else]
+[rule.unused-parameter]
+[rule.unreachable-code]
+[rule.redefines-builtin-id]

@@ -1,0 +1,36 @@
+name: Release
+
+# Um módulo Go não tem passo de publish — o proxy.golang.org resolve qualquer tag
+# vX.Y.Z sob demanda, na primeira vez que alguém rodar `go get` apontando pra ela
+# (ver CONTRIBUTING.md). Este workflow serve só como gate de qualidade (CI +
+# contract tests) e pra criar o GitHub Release.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  contract-tests:
+    needs: ci
+    uses: ./.github/workflows/contract-tests.yml
+
+  github-release:
+    needs: [ci, contract-tests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          generate_release_notes: true

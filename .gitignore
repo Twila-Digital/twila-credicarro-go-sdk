@@ -1,0 +1,8 @@
+/bin/
+/dist/
+*.out
+*.test
+*.exe
+coverage.txt
+go.work
+go.work.sum
