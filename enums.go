@@ -102,6 +102,48 @@ func simulationTypeFromName(name string) SimulationType {
 	}
 }
 
+// CommissionReturnType é o tipo de simulação ao qual o retorno de comissão se aplica (tipo).
+type CommissionReturnType int
+
+// Valores de CommissionReturnType.
+const (
+	CommissionReturnTypeUnknown     CommissionReturnType = -1
+	CommissionReturnTypeFinancing   CommissionReturnType = 1
+	CommissionReturnTypeRefinancing CommissionReturnType = 2
+)
+
+func commissionReturnTypeFromName(name string) CommissionReturnType {
+	switch strings.ToLower(strings.TrimSpace(name)) {
+	case "financing":
+		return CommissionReturnTypeFinancing
+	case "refinancing":
+		return CommissionReturnTypeRefinancing
+	default:
+		return CommissionReturnTypeUnknown
+	}
+}
+
+// CommissionReturnTarget é a quem pertence a configuração de comissão (alvo).
+type CommissionReturnTarget int
+
+// Valores de CommissionReturnTarget.
+const (
+	CommissionReturnTargetUnknown      CommissionReturnTarget = -1
+	CommissionReturnTargetStore        CommissionReturnTarget = 1
+	CommissionReturnTargetOrganization CommissionReturnTarget = 2
+)
+
+func commissionReturnTargetFromName(name string) CommissionReturnTarget {
+	switch strings.ToLower(strings.TrimSpace(name)) {
+	case "store":
+		return CommissionReturnTargetStore
+	case "organization":
+		return CommissionReturnTargetOrganization
+	default:
+		return CommissionReturnTargetUnknown
+	}
+}
+
 // ProposalStep é a etapa de um participante da proposta (enum_etapa / etapa).
 type ProposalStep int
 

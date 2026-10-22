@@ -127,13 +127,14 @@ type RefinancingRangeResponse struct {
 
 // FinancingSimulationRequest é a requisição v2 (com cnpjLoja).
 type FinancingSimulationRequest struct {
-	Cpf           string  `json:"cpf"`
-	LicensePlate  string  `json:"placa"`
-	VehicleAmount float64 `json:"valorVeiculo"`
-	DownPayment   float64 `json:"valorEntrada"`
-	State         string  `json:"uf"`
-	IsZeroKm      bool    `json:"isVeiculoZeroKm"`
-	StoreCnpj     string  `json:"cnpjLoja"`
+	Cpf              string  `json:"cpf"`
+	LicensePlate     string  `json:"placa"`
+	VehicleAmount    float64 `json:"valorVeiculo"`
+	DownPayment      float64 `json:"valorEntrada"`
+	State            string  `json:"uf"`
+	IsZeroKm         bool    `json:"isVeiculoZeroKm"`
+	CommissionReturn *int    `json:"retornoComissao,omitempty"`
+	StoreCnpj        string  `json:"cnpjLoja"`
 }
 
 // FinancingSimulationRequestV1 é a requisição v1 (sem cnpjLoja).
@@ -148,10 +149,11 @@ type FinancingSimulationRequestV1 struct {
 
 // RefinancingSimulationRequest é a requisição v2 (com cnpjLoja).
 type RefinancingSimulationRequest struct {
-	Cpf             string  `json:"cpf"`
-	LicensePlate    string  `json:"placa"`
-	RequestedAmount float64 `json:"valorSolicitado"`
-	StoreCnpj       string  `json:"cnpjLoja"`
+	Cpf              string  `json:"cpf"`
+	LicensePlate     string  `json:"placa"`
+	RequestedAmount  float64 `json:"valorSolicitado"`
+	CommissionReturn *int    `json:"retornoComissao,omitempty"`
+	StoreCnpj        string  `json:"cnpjLoja"`
 }
 
 // RefinancingSimulationRequestV1 é a requisição v1 (sem cnpjLoja).
@@ -182,6 +184,18 @@ type SimulationOption struct {
 
 type SimulationListResponse struct {
 	Simulations []SimulationOption `json:"simulacoes"`
+}
+
+type CommissionReturn struct {
+	Type             string `json:"tipo"`
+	Target           string `json:"alvo"`
+	MinimumReturn    int    `json:"retorno_minimo"`
+	MaximumReturn    int    `json:"retorno_maximo"`
+	AllowDefaultRate bool   `json:"permite_taxa_padrao"`
+}
+
+type ListCommissionReturnsResponse struct {
+	CommissionReturns []CommissionReturn `json:"retornos_comissao"`
 }
 
 type SimulationTransaction struct {
