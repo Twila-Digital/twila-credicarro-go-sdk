@@ -7,6 +7,14 @@ import (
 
 const masked = "***"
 
+// formatOptionalInt mostra "nil" para um ponteiro ausente, do contrário o valor apontado.
+func formatOptionalInt(value *int) string {
+	if value == nil {
+		return "nil"
+	}
+	return fmt.Sprintf("%d", *value)
+}
+
 // maskCPF mostra só os dígitos centrais de um CPF de 11 dígitos (***.456.789-**).
 func maskCPF(value string) string {
 	if value == "" {
@@ -80,16 +88,16 @@ func (r CreateProposalRequest) String() string {
 func (r CreateProposalRequest) GoString() string { return r.String() }
 
 func (r CreateFinancingSimulationRequest) String() string {
-	return fmt.Sprintf("CreateFinancingSimulationRequest{Cpf: %s, LicensePlate: %s, VehicleAmount: %v, DownPayment: %v, State: %s, IsZeroKm: %v, StoreCnpj: %s}",
-		maskCPF(r.Cpf), r.LicensePlate, r.VehicleAmount, r.DownPayment, r.State, r.IsZeroKm, r.StoreCnpj)
+	return fmt.Sprintf("CreateFinancingSimulationRequest{Cpf: %s, LicensePlate: %s, VehicleAmount: %v, DownPayment: %v, State: %s, IsZeroKm: %v, CommissionReturn: %s, StoreCnpj: %s}",
+		maskCPF(r.Cpf), r.LicensePlate, r.VehicleAmount, r.DownPayment, r.State, r.IsZeroKm, formatOptionalInt(r.CommissionReturn), r.StoreCnpj)
 }
 
 // GoString implementa fmt.GoStringer (verbo %#v) sem CPF.
 func (r CreateFinancingSimulationRequest) GoString() string { return r.String() }
 
 func (r CreateRefinancingSimulationRequest) String() string {
-	return fmt.Sprintf("CreateRefinancingSimulationRequest{Cpf: %s, LicensePlate: %s, RequestedAmount: %v, StoreCnpj: %s}",
-		maskCPF(r.Cpf), r.LicensePlate, r.RequestedAmount, r.StoreCnpj)
+	return fmt.Sprintf("CreateRefinancingSimulationRequest{Cpf: %s, LicensePlate: %s, RequestedAmount: %v, CommissionReturn: %s, StoreCnpj: %s}",
+		maskCPF(r.Cpf), r.LicensePlate, r.RequestedAmount, formatOptionalInt(r.CommissionReturn), r.StoreCnpj)
 }
 
 // GoString implementa fmt.GoStringer (verbo %#v) sem CPF.

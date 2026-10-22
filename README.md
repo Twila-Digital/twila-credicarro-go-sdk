@@ -78,6 +78,7 @@ _, err = client.Customers.Upsert(ctx, credicarro.UpsertCustomerRequest{
 options, err := client.Simulations.CreateFinancing(ctx, credicarro.CreateFinancingSimulationRequest{
     Cpf: "12345678909", LicensePlate: "ABC1D23", VehicleAmount: 45000, DownPayment: 5000,
     State: "SP", IsZeroKm: false, StoreCnpj: "11222333000181",
+    // CommissionReturn: &retornoComissao, // opcional, dentro da faixa configurada na loja (ver GetCommissionReturns)
 })
 
 // 3. Proposta a partir da opção escolhida
@@ -97,7 +98,7 @@ O client expõe um struct por recurso:
 | Cliente | Métodos |
 | --- | --- |
 | `client.Customers` | `Upsert`, `Create`, `UpsertAddress`, `UpsertProfessionalData` |
-| `client.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateRefinancing`, `Get`, `List` |
+| `client.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `GetCommissionReturns`, `CreateFinancing`, `CreateRefinancing`, `Get`, `List` |
 | `client.Proposals` | `Create`, `Get`, `List`, `SendVehicleDetails`, `SendDepositAccount`, `UploadDocument` |
 | `client.Webhooks` | `Create`, `List`, `Update`, `Delete` |
 | `client.V1.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateRefinancing` (rotas v1, sem `cnpjLoja`) |
