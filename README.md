@@ -114,7 +114,7 @@ O client expõe um struct por recurso:
 | `client.Customers` | `Upsert`, `Create`, `UpsertAddress`, `UpsertProfessionalData` |
 | `client.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `GetCommissionReturns`, `CreateFinancing`, `CreateRefinancing`, `Get`, `List` |
 | `client.Proposals` | `Create`, `Get`, `List`, `SendVehicleDetails`, `SendDepositAccount`, `UploadDocument` |
-| `client.Webhooks` | `Create`, `List`, `Update`, `Delete`, `ListDeliveries`, `GetDeliveryChart`, `Resend` |
+| `client.Webhooks` | `Create`, `List`, `Update`, `Delete`, `ListDeliveries`, `Resend` |
 | `client.V1.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateRefinancing` (rotas v1, sem `cnpjLoja`) |
 | `client.V1.Proposals` | `Create`, `Get` (rotas v1) |
 
@@ -258,18 +258,13 @@ result, err := client.Webhooks.Create(ctx, credicarro.CreateWebhookRequest{
 })
 ```
 
-### Histórico, gráfico e reenvio
+### Histórico e reenvio
 
 ```go
 status := 500
 // Envios que falharam na semana (filtros opcionais; data sem horário vale pelo dia inteiro)
 failures, err := client.Webhooks.ListDeliveries(ctx, &credicarro.ListWebhookDeliveriesRequest{
     WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-11-01", FinalDate: "2026-11-07", StatusCode: &status},
-})
-
-// Sucessos e erros por intervalo (período obrigatório, até 31 dias; rótulos no horário de Brasília)
-chart, err := client.Webhooks.GetDeliveryChart(ctx, credicarro.WebhookDeliveryChartRequest{
-    WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-11-01", FinalDate: "2026-11-07"},
 })
 
 // Reenvia o mesmo corpo para a sua URL depois de corrigir a falha

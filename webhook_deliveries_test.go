@@ -83,53 +83,6 @@ func TestWebhooksListDeliveriesValidatesPaging(t *testing.T) {
 	}
 }
 
-func TestWebhooksGetDeliveryChartSendsPeriodAndMapsPoints(t *testing.T) {
-	client, api := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
-		writeRaw(w, http.StatusOK, `[{"rotulo":"04","sucessos":42,"erros":0},{"rotulo":"05","sucessos":38,"erros":3}]`)
-	})
-
-	points, err := client.Webhooks.GetDeliveryChart(context.Background(), credicarro.WebhookDeliveryChartRequest{
-		WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-11-04", FinalDate: "2026-11-05", ProposalID: testUUID},
-	})
-	if err != nil {
-		t.Fatalf("erro inesperado: %v", err)
-	}
-
-	query, _ := url.ParseQuery(api.recorded()[0].RawQuery)
-	expected := url.Values{"data_inicial": {"2026-11-04"}, "data_final": {"2026-11-05"}, "id_proposta": {testUUID}}
-	if api.recorded()[0].Path != "v1/webhook/audit/chart" || !reflect.DeepEqual(query, expected) {
-		t.Fatalf("requisição incorreta: %v", query)
-	}
-	want := []credicarro.WebhookDeliveryChartPoint{{Label: "04", SuccessCount: 42}, {Label: "05", SuccessCount: 38, ErrorCount: 3}}
-	if !reflect.DeepEqual(points, want) {
-		t.Fatalf("pontos incorretos: %+v", points)
-	}
-}
-
-func TestWebhooksGetDeliveryChartRequiresThePeriod(t *testing.T) {
-	client, api := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {})
-	_, err := client.Webhooks.GetDeliveryChart(context.Background(), credicarro.WebhookDeliveryChartRequest{
-		WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-11-04"},
-	})
-	var config *credicarro.ConfigurationError
-	if !errors.As(err, &config) || len(api.recorded()) != 0 {
-		t.Fatalf("esperava ConfigurationError sem chamar a API, veio %T: %v", err, err)
-	}
-}
-
-func TestWebhooksGetDeliveryChartMapsDateRangeTooLarge(t *testing.T) {
-	client, _ := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
-		writeRaw(w, http.StatusBadRequest, `{"tipo":"Organization.Webhook.Audit.DateRangeTooLarge","titulo":"Requisição inválida","status":400}`)
-	})
-	_, err := client.Webhooks.GetDeliveryChart(context.Background(), credicarro.WebhookDeliveryChartRequest{
-		WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-01-01", FinalDate: "2026-03-01"},
-	})
-	var validation *credicarro.ValidationError
-	if !errors.As(err, &validation) || validation.ErrorCode != "Organization.Webhook.Audit.DateRangeTooLarge" {
-		t.Fatalf("esperava ValidationError, veio %T: %v", err, err)
-	}
-}
-
 func TestWebhooksResendPostsWithoutBodyOrIdempotencyKey(t *testing.T) {
 	client, api := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		writeRaw(w, http.StatusOK, `{"status_http":null,"resposta":""}`)

@@ -419,12 +419,6 @@ type PagedWebhookDeliveries struct {
 	Page  Page              `json:"pagina"`
 }
 
-type WebhookDeliveryChartPoint struct {
-	Label        string `json:"rotulo"`
-	SuccessCount int    `json:"sucessos"`
-	ErrorCount   int    `json:"erros"`
-}
-
 type WebhookResendResponse struct {
 	StatusCode *int   `json:"status_http"`
 	Response   string `json:"resposta"`

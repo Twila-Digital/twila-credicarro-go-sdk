@@ -13,7 +13,7 @@ import (
 // resendAttemptTimeout cobre a espera pela URL do integrador no reenvio (até 15 s do lado da Credicarro).
 const resendAttemptTimeout = 30 * time.Second
 
-// WebhookDeliveryFilter filtra o histórico e o gráfico de envios. Campos vazios (ou nil) não
+// WebhookDeliveryFilter filtra o histórico de envios. Campos vazios (ou nil) não
 // são enviados. As datas são texto ISO-8601: uma data sem horário ("2026-11-05") vale pelo dia
 // inteiro; com horário, informe o fuso (ex.: "2026-11-05T14:00:00-03:00").
 type WebhookDeliveryFilter struct {
@@ -31,12 +31,6 @@ type ListWebhookDeliveriesRequest struct {
 	WebhookDeliveryFilter
 	Page     int
 	PageSize int
-}
-
-// WebhookDeliveryChartRequest parametriza o gráfico de envios. InitialDate e FinalDate são
-// obrigatórios, e o período pode ter até 31 dias.
-type WebhookDeliveryChartRequest struct {
-	WebhookDeliveryFilter
 }
 
 // WebhookDelivery é um envio de webhook registrado no histórico. Use ID (id_auditoria) em
@@ -60,14 +54,6 @@ func (d WebhookDelivery) String() string {
 
 // GoString não inclui os corpos (verbo %#v).
 func (d WebhookDelivery) GoString() string { return d.String() }
-
-// WebhookDeliveryChartPoint é a contagem de envios em um intervalo do gráfico, no horário de
-// Brasília. Label é "10m" (intervalos de 10 minutos), "14h" (hora) ou "05" (dia), conforme o período.
-type WebhookDeliveryChartPoint struct {
-	Label        string
-	SuccessCount int
-	ErrorCount   int
-}
 
 // WebhookResendResult é o resultado imediato do reenvio. StatusCode é nil quando a sua URL
 // não respondeu.
@@ -122,27 +108,6 @@ func (c *WebhooksClient) ListDeliveries(ctx context.Context, req *ListWebhookDel
 		HasNext:     result.Page.HasNext,
 		HasPrevious: result.Page.HasPrevious,
 	}, nil
-}
-
-// GetDeliveryChart conta os envios com sucesso e com erro por intervalo, no horário de
-// Brasília (GET v1/webhook/audit/chart). O período é obrigatório e pode ter até 31 dias.
-func (c *WebhooksClient) GetDeliveryChart(ctx context.Context, req WebhookDeliveryChartRequest) ([]WebhookDeliveryChartPoint, error) {
-	if err := requireNonEmpty("InitialDate", req.InitialDate); err != nil {
-		return nil, err
-	}
-	if err := requireNonEmpty("FinalDate", req.FinalDate); err != nil {
-		return nil, err
-	}
-
-	var result []wire.WebhookDeliveryChartPoint
-	if err := c.api.get(ctx, "v1/webhook/audit/chart?"+req.values().Encode(), &result); err != nil {
-		return nil, err
-	}
-	points := make([]WebhookDeliveryChartPoint, 0, len(result))
-	for _, point := range result {
-		points = append(points, WebhookDeliveryChartPoint{Label: point.Label, SuccessCount: point.SuccessCount, ErrorCount: point.ErrorCount})
-	}
-	return points, nil
 }
 
 // Resend reenvia para a sua URL o mesmo corpo de um envio do histórico

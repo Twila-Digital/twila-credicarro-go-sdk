@@ -294,11 +294,10 @@ var operations = []op{
 	{method: "PUT", path: "/v1/webhook/{webhookId}", request: wire.UpdateWebhookRequest{}},
 	{method: "DELETE", path: "/v1/webhook/{webhookId}"},
 	{method: "GET", path: "/v1/webhook/audit", responses: map[string]interface{}{"200": wire.PagedWebhookDeliveries{}}, query: append([]string{"pagina_inicial", "limite"}, webhookDeliveryFilterQuery...)},
-	{method: "GET", path: "/v1/webhook/audit/chart", responses: map[string]interface{}{"200": []wire.WebhookDeliveryChartPoint{}}, query: webhookDeliveryFilterQuery},
 	{method: "POST", path: "/v1/webhook/audit/{auditWebhookId}/resend", responses: map[string]interface{}{"200": wire.WebhookResendResponse{}}},
 }
 
-// webhookDeliveryFilterQuery são os filtros do histórico e do gráfico de envios.
+// webhookDeliveryFilterQuery são os filtros do histórico de envios.
 var webhookDeliveryFilterQuery = []string{"data_inicial", "data_final", "id_proposta", "id_simulacao", "numero_proposta", "status_http"}
 
 func (o op) name() string { return o.method + " " + o.path }
