@@ -95,17 +95,19 @@ for _, action := range proposal.PendingActions() {
 **Retorno de comissão (opcional).** Consulte as faixas da loja e envie `CommissionReturn` dentro da faixa da modalidade (`Target` `CommissionReturnTargetStore`):
 
 ```go
-returns, err := client.Simulations.GetCommissionReturns(ctx, "11222333000181") // vazio se a loja não tiver retorno
+returns, err := client.Simulations.GetCommissionReturns(ctx, "11222333000181")
 for _, r := range returns {
     if r.Type == credicarro.SimulationTypeFinancing && r.Target == credicarro.CommissionReturnTargetStore {
         commission := r.MaximumReturn
-        // credicarro.CreateFinancingSimulationRequest{..., CommissionReturn: &commission}
-        _ = commission
+        options, err = client.Simulations.CreateFinancing(ctx, credicarro.CreateFinancingSimulationRequest{
+            Cpf: "12345678909", LicensePlate: "ABC1D23", VehicleAmount: 45000, DownPayment: 5000,
+            State: "SP", StoreCnpj: "11222333000181", CommissionReturn: &commission,
+        })
     }
 }
 ```
 
-Fora da faixa, a API retorna `422 Store.CommissionReturn.OutOfRange`; sem faixa configurada, `422 Store.CommissionReturn.NotConfigured`. `CommissionReturn` nil não é enviado, e as rotas v1 não aceitam o campo.
+Lista vazia significa loja sem retorno configurado. Fora da faixa, a API retorna `422 Store.CommissionReturn.OutOfRange`; sem faixa configurada, `422 Store.CommissionReturn.NotConfigured`. `CommissionReturn` nil não é enviado, e as rotas v1 não aceitam o campo.
 
 O client expõe um struct por recurso:
 
@@ -262,16 +264,14 @@ result, err := client.Webhooks.Create(ctx, credicarro.CreateWebhookRequest{
 
 ```go
 status := 500
-// Envios que falharam na semana (filtros opcionais; data sem horário vale pelo dia inteiro)
 failures, err := client.Webhooks.ListDeliveries(ctx, &credicarro.ListWebhookDeliveriesRequest{
     WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-11-01", FinalDate: "2026-11-07", StatusCode: &status},
 })
 
-// Reenvia o mesmo corpo para a sua URL depois de corrigir a falha
 result, err := client.Webhooks.Resend(ctx, failures.Items[0].ID)
 ```
 
-`Resend` é uma única tentativa. O reenvio chega com uma `Idempotency-Key` nova (`{id_mensagem}:{id_webhook}:{id_tentativa}`); para tratá-lo como a mesma notificação, deduplique pelo prefixo `{id_mensagem}:{id_webhook}`. `StatusCode` vem `nil` quando a sua URL não respondeu.
+Os filtros do histórico são opcionais, e uma data sem horário vale pelo dia inteiro. `Resend` reenvia o mesmo corpo e é uma única tentativa. O reenvio chega com uma `Idempotency-Key` nova (`{id_mensagem}:{id_webhook}:{id_tentativa}`); para tratá-lo como a mesma notificação, deduplique pelo prefixo `{id_mensagem}:{id_webhook}`. `StatusCode` vem `nil` quando a sua URL não respondeu.
 
 No endpoint que recebe as notificações, leia o **corpo bruto** (limite sugerido de 1 MiB), verifique e decodifique:
 
