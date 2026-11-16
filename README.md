@@ -100,8 +100,25 @@ O client expõe um struct por recurso:
 | `client.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateRefinancing`, `Get`, `List` |
 | `client.Proposals` | `Create`, `Get`, `List`, `SendVehicleDetails`, `SendDepositAccount`, `UploadDocument` |
 | `client.Webhooks` | `Create`, `List`, `Update`, `Delete` |
-| `client.V1.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateRefinancing` (rotas v1, sem `cnpjLoja`) |
+| `client.V1.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateFinancingWithoutCpf`, `CreateRefinancing`, `CreateRefinancingWithoutCpf` (rotas v1, sem `cnpjLoja`) |
 | `client.V1.Proposals` | `Create`, `Get` (rotas v1) |
+
+Para mostrar parcelas sem CPF e sem cadastro de cliente, use `client.V1.Simulations.CreateFinancingWithoutCpf` (só placa, valor do veículo e UF; `DownPayment` é opcional e, omitido, usa a entrada mínima da taxa da loja). Nada é gravado: as opções não têm `SimulationID` e não servem para criar proposta.
+
+```go
+downPayment := 5000.0 // opcional: deixe nil para usar a entrada mínima
+options, err := client.V1.Simulations.CreateFinancingWithoutCpf(ctx, credicarro.CreateFinancingWithoutCpfRequest{
+    LicensePlate: "ABC1D23", VehicleAmount: 45000, DownPayment: &downPayment, State: "SP",
+})
+```
+
+Para refinanciamento, `client.V1.Simulations.CreateRefinancingWithoutCpf` segue o mesmo princípio (placa, valor solicitado e UF obrigatórios; só voltam os prazos em cuja faixa o valor cabe, com `MinimumAmount` e `MaximumAmount`).
+
+```go
+options, err := client.V1.Simulations.CreateRefinancingWithoutCpf(ctx, credicarro.CreateRefinancingWithoutCpfRequest{
+    LicensePlate: "ABC1D23", RequestedAmount: 20000, State: "SP",
+})
+```
 
 Todo método recebe `context.Context` como primeiro argumento (idiomático em Go, permite cancelamento/timeout por chamada além do timeout total configurado no client). Os identificadores (`SimulationID`, ids de proposta e de webhook) são UUIDs em `string` e são validados antes de qualquer chamada.
 
@@ -129,7 +146,7 @@ Regras que valem a pena conhecer:
 - **`Customers.Upsert` nunca recebe chave automática.** Sem chave, `POST /v1/customer/unified` é um upsert (cria ou atualiza); com chave, só cria (CPF já cadastrado => `409 Cpf.CpfAlreadyAdded`). Passe `WithIdempotencyKey` apenas se quiser o comportamento "só cria". Sem chave, a chamada **não é repetida** automaticamente.
 - **`Webhooks.Create` não aceita chave e não é repetido**, para não duplicar webhooks. Se der timeout, liste os webhooks antes de tentar de novo.
 - **`Proposals.UploadDocument`**: a API exige a chave. Persista uma por envio e reuse a mesma ao repetir esse envio; use uma chave **nova** ao reenviar a correção de um documento recusado.
-- São repetidas automaticamente: `GET`, a geração de token, `POST` com `Idempotency-Key`, `SendVehicleDetails` e `SendDepositAccount` (substituição), `Webhooks.Update` e `Webhooks.Delete`.
+- São repetidas automaticamente: `GET`, a geração de token, `POST` com `Idempotency-Key`, `V1.Simulations.CreateFinancingWithoutCpf` e `V1.Simulations.CreateRefinancingWithoutCpf` (não enviam chave: só calculam), `SendVehicleDetails` e `SendDepositAccount` (substituição), `Webhooks.Update` e `Webhooks.Delete`.
 - `Retry-After` (segundos ou data HTTP) é respeitado; inválido ou absurdo é ignorado, e se for maior que o orçamento restante o SDK não espera e devolve já o `*RateLimitError` com `RetryAfter`.
 - Status repetidos: `408`, `429` (respeitando `Retry-After`), `500` (`RetryOn500`, padrão `true`), `502`, `503`, `504`, falha de rede e timeout de tentativa. Outros `4xx` nunca são repetidos.
 

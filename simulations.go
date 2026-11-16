@@ -40,6 +40,51 @@ type CreateRefinancingSimulationRequest struct {
 	StoreCnpj       string
 }
 
+// FinancingWithoutCpfOption é uma opção da simulação de financiamento sem CPF (uma por prazo).
+// Não tem SimulationID: nada é gravado e a opção não serve para criar proposta.
+type FinancingWithoutCpfOption struct {
+	RequestedAmount     float64
+	Term                int
+	InstallmentAmount   float64
+	TacAmount           float64
+	BoletoAmount        float64
+	InsuranceAmount     float64
+	IofAmount           float64
+	IofRate             float64
+	TotalCreditAmount   float64
+	TotalDebtAmount     float64
+	MonthlyCet          float64
+	AnnualCet           float64
+	MonthlyInterestRate float64
+	AnnualInterestRate  float64
+	// ApproximateDailyRetention é nil quando não se aplica.
+	ApproximateDailyRetention *float64
+	MinimumDownPayment        float64
+}
+
+// RefinancingWithoutCpfOption é uma opção da simulação de refinanciamento sem CPF (uma por prazo).
+// Não tem SimulationID: nada é gravado e a opção não serve para criar proposta.
+type RefinancingWithoutCpfOption struct {
+	RequestedAmount     float64
+	Term                int
+	InstallmentAmount   float64
+	TacAmount           float64
+	BoletoAmount        float64
+	InsuranceAmount     float64
+	IofAmount           float64
+	IofRate             float64
+	TotalCreditAmount   float64
+	TotalDebtAmount     float64
+	MonthlyCet          float64
+	AnnualCet           float64
+	MonthlyInterestRate float64
+	AnnualInterestRate  float64
+	// ApproximateDailyRetention é nil quando não se aplica.
+	ApproximateDailyRetention *float64
+	MinimumAmount             float64
+	MaximumAmount             float64
+}
+
 // SimulationOption é uma opção de simulação (uma por prazo). Use SimulationID em
 // CreateProposalRequest.
 type SimulationOption struct {

@@ -27,6 +27,14 @@ var autoKeyPaths = map[string]bool{
 // TokenPath é a rota de geração do token de acesso.
 const TokenPath = "v1/authentication/accesstoken"
 
+// financingWithoutCpfPath é a simulação sem CPF: não grava nada, não usa Idempotency-Key e
+// é segura para repetir.
+const financingWithoutCpfPath = "v1/proposal/simulation/financing/without-cpf"
+
+// refinancingWithoutCpfPath é a simulação de refinanciamento sem CPF: mesma natureza (só calcula,
+// não usa Idempotency-Key, segura para repetir).
+const refinancingWithoutCpfPath = "v1/proposal/simulation/refinancing/without-cpf"
+
 // normalize remove a query string e barras nas pontas.
 func normalize(path string) string {
 	if i := strings.IndexByte(path, '?'); i >= 0 {
@@ -62,7 +70,8 @@ func RequiresKey(method, path string) bool {
 // IsRetrySafe indica se a requisição pode ser repetida sem risco de duplicar efeitos.
 //
 // Seguras: GET/HEAD/OPTIONS; POST de token; POST com Idempotency-Key; POST de dados do
-// veículo e de conta de recebimento (semântica de substituição); PUT/DELETE de webhook.
+// veículo e de conta de recebimento (semântica de substituição); POST da simulação de
+// financiamento e de refinanciamento sem CPF (só calculam, não gravam nada); PUT/DELETE de webhook.
 // Não seguras: POST v1/webhook e POST v1/customer/unified sem chave.
 func IsRetrySafe(method, path string, hasKey bool) bool {
 	p := normalize(path)
@@ -73,7 +82,7 @@ func IsRetrySafe(method, path string, hasKey bool) bool {
 	case "PUT", "DELETE":
 		return strings.HasPrefix(p, "v1/webhook/")
 	case "POST":
-		if hasKey || p == TokenPath {
+		if hasKey || p == TokenPath || p == financingWithoutCpfPath || p == refinancingWithoutCpfPath {
 			return true
 		}
 		return proposalSubPath(p, "vehicle-detail") || proposalSubPath(p, "deposit-account")

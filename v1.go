@@ -24,6 +24,22 @@ type V1CreateFinancingSimulationRequest struct {
 	IsZeroKm      bool
 }
 
+// CreateFinancingWithoutCpfRequest é a requisição da simulação de financiamento sem CPF (v1).
+type CreateFinancingWithoutCpfRequest struct {
+	LicensePlate  string
+	VehicleAmount float64
+	// DownPayment é opcional: nil usa a entrada mínima da taxa da loja e omite valorEntrada do JSON.
+	DownPayment *float64
+	State       string
+}
+
+// CreateRefinancingWithoutCpfRequest é a requisição da simulação de refinanciamento sem CPF (v1).
+type CreateRefinancingWithoutCpfRequest struct {
+	LicensePlate    string
+	RequestedAmount float64
+	State           string
+}
+
 // V1CreateRefinancingSimulationRequest é a requisição de simulação de refinanciamento v1 (sem a loja).
 type V1CreateRefinancingSimulationRequest struct {
 	Cpf             string
@@ -68,6 +84,93 @@ func (c *V1SimulationsClient) CreateFinancing(ctx context.Context, req V1CreateF
 		DownPayment:   req.DownPayment,
 	}
 	return postSimulation(ctx, c.api, "v1/proposal/simulation/financing", wireReq, ropts)
+}
+
+// CreateFinancingWithoutCpf simula um financiamento só com placa, valor do veículo e UF, sem CPF
+// e sem cadastro de cliente (POST v1/proposal/simulation/financing/without-cpf) e devolve uma
+// opção por prazo. Usa a loja de integração do parceiro. Nada é gravado: as opções não têm
+// SimulationID e não servem para criar proposta. Não usa Idempotency-Key e é seguro repetir.
+func (c *V1SimulationsClient) CreateFinancingWithoutCpf(ctx context.Context, req CreateFinancingWithoutCpfRequest, opts ...RequestOption) ([]FinancingWithoutCpfOption, error) {
+	ropts, err := applyRequestOptions(opts)
+	if err != nil {
+		return nil, err
+	}
+	wireReq := wire.FinancingWithoutCpfRequest{
+		LicensePlate:  req.LicensePlate,
+		VehicleAmount: req.VehicleAmount,
+		DownPayment:   req.DownPayment,
+		State:         req.State,
+	}
+	var result wire.FinancingWithoutCpfResponse
+	if err := c.api.post(ctx, "v1/proposal/simulation/financing/without-cpf", wireReq, &result, ropts); err != nil {
+		return nil, err
+	}
+	options := make([]FinancingWithoutCpfOption, 0, len(result.Options))
+	for _, o := range result.Options {
+		options = append(options, FinancingWithoutCpfOption{
+			RequestedAmount:           o.RequestedAmount,
+			Term:                      o.Term,
+			InstallmentAmount:         o.InstallmentAmount,
+			TacAmount:                 o.TacAmount,
+			BoletoAmount:              o.BoletoAmount,
+			InsuranceAmount:           o.InsuranceAmount,
+			IofAmount:                 o.IofAmount,
+			IofRate:                   o.IofRate,
+			TotalCreditAmount:         o.TotalCreditAmount,
+			TotalDebtAmount:           o.TotalDebtAmount,
+			MonthlyCet:                o.MonthlyCet,
+			AnnualCet:                 o.AnnualCet,
+			MonthlyInterestRate:       o.MonthlyInterestRate,
+			AnnualInterestRate:        o.AnnualInterestRate,
+			ApproximateDailyRetention: o.ApproximateDailyRetention,
+			MinimumDownPayment:        o.MinimumDownPayment,
+		})
+	}
+	return options, nil
+}
+
+// CreateRefinancingWithoutCpf simula um refinanciamento só com placa, valor solicitado e UF, sem CPF
+// e sem cadastro de cliente (POST v1/proposal/simulation/refinancing/without-cpf) e devolve uma
+// opção por prazo em cuja faixa o valor cabe. Usa a loja de integração do parceiro. Nada é gravado:
+// as opções não têm SimulationID e não servem para criar proposta. Não usa Idempotency-Key e é
+// seguro repetir.
+func (c *V1SimulationsClient) CreateRefinancingWithoutCpf(ctx context.Context, req CreateRefinancingWithoutCpfRequest, opts ...RequestOption) ([]RefinancingWithoutCpfOption, error) {
+	ropts, err := applyRequestOptions(opts)
+	if err != nil {
+		return nil, err
+	}
+	wireReq := wire.RefinancingWithoutCpfRequest{
+		LicensePlate:    req.LicensePlate,
+		RequestedAmount: req.RequestedAmount,
+		State:           req.State,
+	}
+	var result wire.RefinancingWithoutCpfResponse
+	if err := c.api.post(ctx, "v1/proposal/simulation/refinancing/without-cpf", wireReq, &result, ropts); err != nil {
+		return nil, err
+	}
+	options := make([]RefinancingWithoutCpfOption, 0, len(result.Options))
+	for _, o := range result.Options {
+		options = append(options, RefinancingWithoutCpfOption{
+			RequestedAmount:           o.RequestedAmount,
+			Term:                      o.Term,
+			InstallmentAmount:         o.InstallmentAmount,
+			TacAmount:                 o.TacAmount,
+			BoletoAmount:              o.BoletoAmount,
+			InsuranceAmount:           o.InsuranceAmount,
+			IofAmount:                 o.IofAmount,
+			IofRate:                   o.IofRate,
+			TotalCreditAmount:         o.TotalCreditAmount,
+			TotalDebtAmount:           o.TotalDebtAmount,
+			MonthlyCet:                o.MonthlyCet,
+			AnnualCet:                 o.AnnualCet,
+			MonthlyInterestRate:       o.MonthlyInterestRate,
+			AnnualInterestRate:        o.AnnualInterestRate,
+			ApproximateDailyRetention: o.ApproximateDailyRetention,
+			MinimumAmount:             o.MinimumAmount,
+			MaximumAmount:             o.MaximumAmount,
+		})
+	}
+	return options, nil
 }
 
 // CreateRefinancing cria a simulação de refinanciamento v1 (POST v1/proposal/simulation/refinancing).

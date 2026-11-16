@@ -146,6 +146,14 @@ type FinancingSimulationRequestV1 struct {
 	DownPayment   float64 `json:"valorEntrada"`
 }
 
+// FinancingWithoutCpfRequest é a requisição da simulação v1 sem CPF (valorEntrada é opcional).
+type FinancingWithoutCpfRequest struct {
+	LicensePlate  string   `json:"placa"`
+	VehicleAmount float64  `json:"valorVeiculo"`
+	DownPayment   *float64 `json:"valorEntrada,omitempty"`
+	State         string   `json:"uf"`
+}
+
 // RefinancingSimulationRequest é a requisição v2 (com cnpjLoja).
 type RefinancingSimulationRequest struct {
 	Cpf             string  `json:"cpf"`
@@ -178,6 +186,62 @@ type SimulationOption struct {
 	MonthlyInterestRate       float64  `json:"percentual_juros_mensal"`
 	AnnualInterestRate        float64  `json:"percentual_juros_anual"`
 	ApproximateDailyRetention *float64 `json:"valor_retencao_diaria_aproximado,omitempty"`
+}
+
+// FinancingWithoutCpfOption é uma opção por prazo da simulação sem CPF (não tem id_simulacao).
+type FinancingWithoutCpfOption struct {
+	RequestedAmount           float64  `json:"valor_solicitado"`
+	Term                      int      `json:"prazo"`
+	InstallmentAmount         float64  `json:"valor_parcela"`
+	TacAmount                 float64  `json:"valor_tac"`
+	BoletoAmount              float64  `json:"valor_boleto"`
+	InsuranceAmount           float64  `json:"valor_seguro"`
+	IofAmount                 float64  `json:"valor_iof"`
+	IofRate                   float64  `json:"percentual_iof"`
+	TotalCreditAmount         float64  `json:"valor_credito_total"`
+	TotalDebtAmount           float64  `json:"valor_divida_total"`
+	MonthlyCet                float64  `json:"percentual_cet_mensal"`
+	AnnualCet                 float64  `json:"percentual_cet_anual"`
+	MonthlyInterestRate       float64  `json:"percentual_juros_mensal"`
+	AnnualInterestRate        float64  `json:"percentual_juros_anual"`
+	ApproximateDailyRetention *float64 `json:"valor_retencao_diaria_aproximado,omitempty"`
+	MinimumDownPayment        float64  `json:"valor_entrada_minima"`
+}
+
+type FinancingWithoutCpfResponse struct {
+	Options []FinancingWithoutCpfOption `json:"cotacoes"`
+}
+
+// RefinancingWithoutCpfRequest é a requisição da simulação v1 de refinanciamento sem CPF.
+type RefinancingWithoutCpfRequest struct {
+	LicensePlate    string  `json:"placa"`
+	RequestedAmount float64 `json:"valorSolicitado"`
+	State           string  `json:"uf"`
+}
+
+// RefinancingWithoutCpfOption é uma opção por prazo da simulação de refinanciamento sem CPF (não tem id_simulacao).
+type RefinancingWithoutCpfOption struct {
+	RequestedAmount           float64  `json:"valor_solicitado"`
+	Term                      int      `json:"prazo"`
+	InstallmentAmount         float64  `json:"valor_parcela"`
+	TacAmount                 float64  `json:"valor_tac"`
+	BoletoAmount              float64  `json:"valor_boleto"`
+	InsuranceAmount           float64  `json:"valor_seguro"`
+	IofAmount                 float64  `json:"valor_iof"`
+	IofRate                   float64  `json:"percentual_iof"`
+	TotalCreditAmount         float64  `json:"valor_credito_total"`
+	TotalDebtAmount           float64  `json:"valor_divida_total"`
+	MonthlyCet                float64  `json:"percentual_cet_mensal"`
+	AnnualCet                 float64  `json:"percentual_cet_anual"`
+	MonthlyInterestRate       float64  `json:"percentual_juros_mensal"`
+	AnnualInterestRate        float64  `json:"percentual_juros_anual"`
+	ApproximateDailyRetention *float64 `json:"valor_retencao_diaria_aproximado,omitempty"`
+	MinimumAmount             float64  `json:"valor_minimo_refinanciavel"`
+	MaximumAmount             float64  `json:"valor_maximo_refinanciavel"`
+}
+
+type RefinancingWithoutCpfResponse struct {
+	Options []RefinancingWithoutCpfOption `json:"cotacoes"`
 }
 
 type SimulationListResponse struct {
