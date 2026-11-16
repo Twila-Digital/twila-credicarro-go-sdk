@@ -17,12 +17,12 @@ const resendAttemptTimeout = 30 * time.Second
 // são enviados. As datas são texto ISO-8601: uma data sem horário ("2026-11-05") vale pelo dia
 // inteiro; com horário, informe o fuso (ex.: "2026-11-05T14:00:00-03:00").
 type WebhookDeliveryFilter struct {
-	InitialDate    string // data_inicial
-	FinalDate      string // data_final
-	ProposalID     string // id_proposta
-	SimulationID   string // id_simulacao
-	ProposalNumber string // numero_proposta, até 50 caracteres
-	StatusCode     *int   // status_http devolvido pela sua URL (100 a 599)
+	InitialDate    string
+	FinalDate      string
+	ProposalID     string
+	SimulationID   string
+	ProposalNumber string
+	StatusCode     *int
 }
 
 // ListWebhookDeliveriesRequest parametriza o histórico de envios: filtros opcionais e
@@ -40,8 +40,8 @@ type WebhookDelivery struct {
 	WebhookID  string
 	Type       WebhookType
 	TypeRaw    string
-	Request    string // corpo enviado, como texto JSON
-	Response   string // corpo devolvido pela sua URL; vazio quando não houve resposta
+	Request    string
+	Response   string
 	StatusCode *int
 	CreatedAt  string
 }

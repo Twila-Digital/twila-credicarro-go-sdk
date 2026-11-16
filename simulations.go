@@ -30,8 +30,7 @@ type CreateFinancingSimulationRequest struct {
 	State         string  // uf do registro do veículo
 	IsZeroKm      bool
 	StoreCnpj     string // cnpjLoja, formatado ou só números
-	// CommissionReturn é o retornoComissao (opcional). Quando informado, precisa estar na
-	// faixa Financing da loja (veja GetCommissionReturns).
+
 	CommissionReturn *int
 }
 
@@ -41,8 +40,7 @@ type CreateRefinancingSimulationRequest struct {
 	LicensePlate    string
 	RequestedAmount float64 // precisa estar na faixa refinanciável da placa
 	StoreCnpj       string
-	// CommissionReturn é o retornoComissao (opcional). Quando informado, precisa estar na
-	// faixa Refinancing da loja (veja GetCommissionReturns).
+
 	CommissionReturn *int
 }
 

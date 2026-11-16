@@ -127,15 +127,14 @@ type RefinancingRangeResponse struct {
 
 // FinancingSimulationRequest é a requisição v2 (com cnpjLoja).
 type FinancingSimulationRequest struct {
-	Cpf           string  `json:"cpf"`
-	LicensePlate  string  `json:"placa"`
-	VehicleAmount float64 `json:"valorVeiculo"`
-	DownPayment   float64 `json:"valorEntrada"`
-	State         string  `json:"uf"`
-	IsZeroKm      bool    `json:"isVeiculoZeroKm"`
-	StoreCnpj     string  `json:"cnpjLoja"`
-	// CommissionReturn é o retornoComissao (opcional): omitido quando nil.
-	CommissionReturn *int `json:"retornoComissao,omitempty"`
+	Cpf              string  `json:"cpf"`
+	LicensePlate     string  `json:"placa"`
+	VehicleAmount    float64 `json:"valorVeiculo"`
+	DownPayment      float64 `json:"valorEntrada"`
+	State            string  `json:"uf"`
+	IsZeroKm         bool    `json:"isVeiculoZeroKm"`
+	StoreCnpj        string  `json:"cnpjLoja"`
+	CommissionReturn *int    `json:"retornoComissao,omitempty"`
 }
 
 // FinancingSimulationRequestV1 é a requisição v1 (sem cnpjLoja).
@@ -150,12 +149,11 @@ type FinancingSimulationRequestV1 struct {
 
 // RefinancingSimulationRequest é a requisição v2 (com cnpjLoja).
 type RefinancingSimulationRequest struct {
-	Cpf             string  `json:"cpf"`
-	LicensePlate    string  `json:"placa"`
-	RequestedAmount float64 `json:"valorSolicitado"`
-	StoreCnpj       string  `json:"cnpjLoja"`
-	// CommissionReturn é o retornoComissao (opcional): omitido quando nil.
-	CommissionReturn *int `json:"retornoComissao,omitempty"`
+	Cpf              string  `json:"cpf"`
+	LicensePlate     string  `json:"placa"`
+	RequestedAmount  float64 `json:"valorSolicitado"`
+	StoreCnpj        string  `json:"cnpjLoja"`
+	CommissionReturn *int    `json:"retornoComissao,omitempty"`
 }
 
 type CommissionReturn struct {
