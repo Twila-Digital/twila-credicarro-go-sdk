@@ -134,6 +134,8 @@ type FinancingSimulationRequest struct {
 	State         string  `json:"uf"`
 	IsZeroKm      bool    `json:"isVeiculoZeroKm"`
 	StoreCnpj     string  `json:"cnpjLoja"`
+	// CommissionReturn é o retornoComissao (opcional): omitido quando nil.
+	CommissionReturn *int `json:"retornoComissao,omitempty"`
 }
 
 // FinancingSimulationRequestV1 é a requisição v1 (sem cnpjLoja).
@@ -152,6 +154,20 @@ type RefinancingSimulationRequest struct {
 	LicensePlate    string  `json:"placa"`
 	RequestedAmount float64 `json:"valorSolicitado"`
 	StoreCnpj       string  `json:"cnpjLoja"`
+	// CommissionReturn é o retornoComissao (opcional): omitido quando nil.
+	CommissionReturn *int `json:"retornoComissao,omitempty"`
+}
+
+type CommissionReturn struct {
+	Type              string `json:"tipo"`
+	Target            string `json:"alvo"`
+	MinimumReturn     int    `json:"retorno_minimo"`
+	MaximumReturn     int    `json:"retorno_maximo"`
+	AllowsDefaultRate bool   `json:"permite_taxa_padrao"`
+}
+
+type CommissionReturnsResponse struct {
+	Items []CommissionReturn `json:"retornos_comissao"`
 }
 
 // RefinancingSimulationRequestV1 é a requisição v1 (sem cnpjLoja).
@@ -386,6 +402,32 @@ type Webhook struct {
 type PagedWebhooks struct {
 	Items []Webhook `json:"itens"`
 	Page  Page      `json:"pagina"`
+}
+
+type WebhookDelivery struct {
+	AuditID    string  `json:"id_auditoria"`
+	WebhookID  *string `json:"id_webhook"`
+	Type       string  `json:"tipo"`
+	Request    string  `json:"requisicao"`
+	Response   string  `json:"resposta"`
+	StatusCode *int    `json:"status_http"`
+	CreatedAt  string  `json:"data_criacao"`
+}
+
+type PagedWebhookDeliveries struct {
+	Items []WebhookDelivery `json:"itens"`
+	Page  Page              `json:"pagina"`
+}
+
+type WebhookDeliveryChartPoint struct {
+	Label        string `json:"rotulo"`
+	SuccessCount int    `json:"sucessos"`
+	ErrorCount   int    `json:"erros"`
+}
+
+type WebhookResendResponse struct {
+	StatusCode *int   `json:"status_http"`
+	Response   string `json:"resposta"`
 }
 
 // ProposalWebhookEvent é o payload de notificação de proposta. Aceita o formato v1

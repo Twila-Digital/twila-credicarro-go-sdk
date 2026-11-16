@@ -30,6 +30,9 @@ type CreateFinancingSimulationRequest struct {
 	State         string  // uf do registro do veículo
 	IsZeroKm      bool
 	StoreCnpj     string // cnpjLoja, formatado ou só números
+	// CommissionReturn é o retornoComissao (opcional). Quando informado, precisa estar na
+	// faixa Financing da loja (veja GetCommissionReturns).
+	CommissionReturn *int
 }
 
 // CreateRefinancingSimulationRequest é a requisição de simulação de refinanciamento (v2, com a loja).
@@ -38,6 +41,21 @@ type CreateRefinancingSimulationRequest struct {
 	LicensePlate    string
 	RequestedAmount float64 // precisa estar na faixa refinanciável da placa
 	StoreCnpj       string
+	// CommissionReturn é o retornoComissao (opcional). Quando informado, precisa estar na
+	// faixa Refinancing da loja (veja GetCommissionReturns).
+	CommissionReturn *int
+}
+
+// CommissionReturn é uma faixa de retorno de comissão da loja. A simulação valida pela
+// faixa com Target CommissionReturnTargetStore. Os campos XxxRaw guardam o texto da API.
+type CommissionReturn struct {
+	Type              SimulationType
+	TypeRaw           string
+	Target            CommissionReturnTarget
+	TargetRaw         string
+	MinimumReturn     int
+	MaximumReturn     int
+	AllowsDefaultRate bool
 }
 
 // SimulationOption é uma opção de simulação (uma por prazo). Use SimulationID em
@@ -144,6 +162,35 @@ func (c *SimulationsClient) GetRefinancingRange(ctx context.Context, licensePlat
 	return getRefinancingRange(ctx, c.api, "v2/proposal/simulation/range/refinancing", rangeQuery(licensePlate, storeCnpj, true))
 }
 
+// GetCommissionReturns consulta as faixas de retorno de comissão da loja
+// (GET v2/proposal/simulation/commission-returns). Lista vazia quando a loja não tem
+// retorno configurado.
+func (c *SimulationsClient) GetCommissionReturns(ctx context.Context, storeCnpj string) ([]CommissionReturn, error) {
+	if err := requireNonEmpty("storeCnpj", storeCnpj); err != nil {
+		return nil, err
+	}
+	q := url.Values{}
+	q.Set("cnpjLoja", storeCnpj)
+
+	var result wire.CommissionReturnsResponse
+	if err := c.api.get(ctx, "v2/proposal/simulation/commission-returns?"+q.Encode(), &result); err != nil {
+		return nil, err
+	}
+	items := make([]CommissionReturn, 0, len(result.Items))
+	for _, item := range result.Items {
+		items = append(items, CommissionReturn{
+			Type:              simulationTypeFromName(item.Type),
+			TypeRaw:           item.Type,
+			Target:            commissionReturnTargetFromName(item.Target),
+			TargetRaw:         item.Target,
+			MinimumReturn:     item.MinimumReturn,
+			MaximumReturn:     item.MaximumReturn,
+			AllowsDefaultRate: item.AllowsDefaultRate,
+		})
+	}
+	return items, nil
+}
+
 // CreateFinancing cria a simulação de financiamento (POST v2/proposal/simulation/financing)
 // e devolve uma opção por prazo. Recebe Idempotency-Key automática.
 func (c *SimulationsClient) CreateFinancing(ctx context.Context, req CreateFinancingSimulationRequest, opts ...RequestOption) ([]SimulationOption, error) {
@@ -159,6 +206,8 @@ func (c *SimulationsClient) CreateFinancing(ctx context.Context, req CreateFinan
 		State:         req.State,
 		IsZeroKm:      req.IsZeroKm,
 		StoreCnpj:     req.StoreCnpj,
+
+		CommissionReturn: req.CommissionReturn,
 	}
 	return postSimulation(ctx, c.api, "v2/proposal/simulation/financing", wireReq, ropts)
 }
@@ -175,6 +224,8 @@ func (c *SimulationsClient) CreateRefinancing(ctx context.Context, req CreateRef
 		LicensePlate:    req.LicensePlate,
 		RequestedAmount: req.RequestedAmount,
 		StoreCnpj:       req.StoreCnpj,
+
+		CommissionReturn: req.CommissionReturn,
 	}
 	return postSimulation(ctx, c.api, "v2/proposal/simulation/refinancing", wireReq, ropts)
 }

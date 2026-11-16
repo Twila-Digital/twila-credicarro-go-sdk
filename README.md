@@ -92,14 +92,29 @@ for _, action := range proposal.PendingActions() {
 }
 ```
 
+**Retorno de comissão (opcional).** Consulte as faixas da loja e envie `CommissionReturn` dentro da faixa da modalidade (`Target` `CommissionReturnTargetStore`):
+
+```go
+returns, err := client.Simulations.GetCommissionReturns(ctx, "11222333000181") // vazio se a loja não tiver retorno
+for _, r := range returns {
+    if r.Type == credicarro.SimulationTypeFinancing && r.Target == credicarro.CommissionReturnTargetStore {
+        commission := r.MaximumReturn
+        // credicarro.CreateFinancingSimulationRequest{..., CommissionReturn: &commission}
+        _ = commission
+    }
+}
+```
+
+Fora da faixa, a API retorna `422 Store.CommissionReturn.OutOfRange`; sem faixa configurada, `422 Store.CommissionReturn.NotConfigured`. `CommissionReturn` nil não é enviado, e as rotas v1 não aceitam o campo.
+
 O client expõe um struct por recurso:
 
 | Cliente | Métodos |
 | --- | --- |
 | `client.Customers` | `Upsert`, `Create`, `UpsertAddress`, `UpsertProfessionalData` |
-| `client.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateRefinancing`, `Get`, `List` |
+| `client.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `GetCommissionReturns`, `CreateFinancing`, `CreateRefinancing`, `Get`, `List` |
 | `client.Proposals` | `Create`, `Get`, `List`, `SendVehicleDetails`, `SendDepositAccount`, `UploadDocument` |
-| `client.Webhooks` | `Create`, `List`, `Update`, `Delete` |
+| `client.Webhooks` | `Create`, `List`, `Update`, `Delete`, `ListDeliveries`, `GetDeliveryChart`, `Resend` |
 | `client.V1.Simulations` | `GetFinancingRange`, `GetRefinancingRange`, `CreateFinancing`, `CreateRefinancing` (rotas v1, sem `cnpjLoja`) |
 | `client.V1.Proposals` | `Create`, `Get` (rotas v1) |
 
@@ -128,6 +143,7 @@ Regras que valem a pena conhecer:
 
 - **`Customers.Upsert` nunca recebe chave automática.** Sem chave, `POST /v1/customer/unified` é um upsert (cria ou atualiza); com chave, só cria (CPF já cadastrado => `409 Cpf.CpfAlreadyAdded`). Passe `WithIdempotencyKey` apenas se quiser o comportamento "só cria". Sem chave, a chamada **não é repetida** automaticamente.
 - **`Webhooks.Create` não aceita chave e não é repetido**, para não duplicar webhooks. Se der timeout, liste os webhooks antes de tentar de novo.
+- **`Webhooks.Resend` não é repetido**, para não disparar o webhook duas vezes. Ele espera até 30 s pela resposta da sua URL.
 - **`Proposals.UploadDocument`**: a API exige a chave. Persista uma por envio e reuse a mesma ao repetir esse envio; use uma chave **nova** ao reenviar a correção de um documento recusado.
 - São repetidas automaticamente: `GET`, a geração de token, `POST` com `Idempotency-Key`, `SendVehicleDetails` e `SendDepositAccount` (substituição), `Webhooks.Update` e `Webhooks.Delete`.
 - `Retry-After` (segundos ou data HTTP) é respeitado; inválido ou absurdo é ignorado, e se for maior que o orçamento restante o SDK não espera e devolve já o `*RateLimitError` com `RetryAfter`.
@@ -161,7 +177,7 @@ O token é obtido em `POST /v1/authentication/accesstoken`, mantido em cache at�
 
 ## Paginação
 
-`Simulations.List`, `Proposals.List` e `Webhooks.List` retornam `*PagedResult[T]` (genérico) — sem auto-paginação, você controla o avanço de página. Passe `nil` para a primeira página com 10 itens, ou um `*ListRequest` (`Page` ≥ 1, `PageSize` de 1 a 100):
+`Simulations.List`, `Proposals.List`, `Webhooks.List` e `Webhooks.ListDeliveries` retornam `*PagedResult[T]` (genérico) — sem auto-paginação, você controla o avanço de página. Passe `nil` para a primeira página com 10 itens, ou um `*ListRequest` (`Page` ≥ 1, `PageSize` de 1 a 100):
 
 ```go
 page, err := client.Proposals.List(ctx, &credicarro.ListRequest{Page: 1, PageSize: 20})
@@ -241,6 +257,26 @@ result, err := client.Webhooks.Create(ctx, credicarro.CreateWebhookRequest{
     Credential:         "dXN1YXJpbzpzZW5oYQ==", // Base64 de usuario:senha
 })
 ```
+
+### Histórico, gráfico e reenvio
+
+```go
+status := 500
+// Envios que falharam na semana (filtros opcionais; data sem horário vale pelo dia inteiro)
+failures, err := client.Webhooks.ListDeliveries(ctx, &credicarro.ListWebhookDeliveriesRequest{
+    WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-11-01", FinalDate: "2026-11-07", StatusCode: &status},
+})
+
+// Sucessos e erros por intervalo (período obrigatório, até 31 dias; rótulos no horário de Brasília)
+chart, err := client.Webhooks.GetDeliveryChart(ctx, credicarro.WebhookDeliveryChartRequest{
+    WebhookDeliveryFilter: credicarro.WebhookDeliveryFilter{InitialDate: "2026-11-01", FinalDate: "2026-11-07"},
+})
+
+// Reenvia o mesmo corpo para a sua URL depois de corrigir a falha
+result, err := client.Webhooks.Resend(ctx, failures.Items[0].ID)
+```
+
+`Resend` é uma única tentativa. O reenvio chega com uma `Idempotency-Key` nova (`{id_mensagem}:{id_webhook}:{id_tentativa}`); para tratá-lo como a mesma notificação, deduplique pelo prefixo `{id_mensagem}:{id_webhook}`. `StatusCode` vem `nil` quando a sua URL não respondeu.
 
 No endpoint que recebe as notificações, leia o **corpo bruto** (limite sugerido de 1 MiB), verifique e decodifique:
 

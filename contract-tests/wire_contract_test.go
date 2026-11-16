@@ -268,6 +268,7 @@ var operations = []op{
 
 	{method: "GET", path: "/v2/proposal/simulation/range/financing", responses: map[string]interface{}{"200": wire.FinancingRangeResponse{}}, query: []string{"placa", "cnpjLoja"}},
 	{method: "GET", path: "/v2/proposal/simulation/range/refinancing", responses: map[string]interface{}{"200": wire.RefinancingRangeResponse{}}, query: []string{"placa", "cnpjLoja"}},
+	{method: "GET", path: "/v2/proposal/simulation/commission-returns", responses: map[string]interface{}{"200": wire.CommissionReturnsResponse{}}, query: []string{"cnpjLoja"}},
 	{method: "POST", path: "/v2/proposal/simulation/financing", request: wire.FinancingSimulationRequest{}, responses: map[string]interface{}{"201": wire.SimulationListResponse{}}, idempotency: true},
 	{method: "POST", path: "/v2/proposal/simulation/refinancing", request: wire.RefinancingSimulationRequest{}, responses: map[string]interface{}{"201": wire.SimulationListResponse{}}, idempotency: true},
 
@@ -292,7 +293,13 @@ var operations = []op{
 	{method: "GET", path: "/v1/webhook", responses: map[string]interface{}{"200": wire.PagedWebhooks{}}, query: []string{"pagina_inicial", "limite"}},
 	{method: "PUT", path: "/v1/webhook/{webhookId}", request: wire.UpdateWebhookRequest{}},
 	{method: "DELETE", path: "/v1/webhook/{webhookId}"},
+	{method: "GET", path: "/v1/webhook/audit", responses: map[string]interface{}{"200": wire.PagedWebhookDeliveries{}}, query: append([]string{"pagina_inicial", "limite"}, webhookDeliveryFilterQuery...)},
+	{method: "GET", path: "/v1/webhook/audit/chart", responses: map[string]interface{}{"200": []wire.WebhookDeliveryChartPoint{}}, query: webhookDeliveryFilterQuery},
+	{method: "POST", path: "/v1/webhook/audit/{auditWebhookId}/resend", responses: map[string]interface{}{"200": wire.WebhookResendResponse{}}},
 }
+
+// webhookDeliveryFilterQuery são os filtros do histórico e do gráfico de envios.
+var webhookDeliveryFilterQuery = []string{"data_inicial", "data_final", "id_proposta", "id_simulacao", "numero_proposta", "status_http"}
 
 func (o op) name() string { return o.method + " " + o.path }
 
@@ -364,6 +371,10 @@ func TestResponseWireTypesMatchTheSchema(t *testing.T) {
 					t.Fatalf("a operação %s não declara resposta JSON %s no openapi.yaml", o.name(), status)
 				}
 				typ := reflect.TypeOf(response)
+				if typ.Kind() == reflect.Slice {
+					schema = resolve(root, asMap(schema["items"]))
+					typ = typ.Elem()
+				}
 				checkSubset(t, root, typ.Name(), typ, schema)
 			})
 		}
@@ -434,7 +445,7 @@ func TestUnifiedCustomerAcceptsIdempotencyKeyButSDKNeverAddsItAutomatically(t *t
 
 func TestWebhookRoutesDoNotUseIdempotencyKey(t *testing.T) {
 	root := openAPI(t)
-	for _, o := range []op{{method: "POST", path: "/v1/webhook"}, {method: "PUT", path: "/v1/webhook/{webhookId}"}, {method: "DELETE", path: "/v1/webhook/{webhookId}"}} {
+	for _, o := range []op{{method: "POST", path: "/v1/webhook"}, {method: "PUT", path: "/v1/webhook/{webhookId}"}, {method: "DELETE", path: "/v1/webhook/{webhookId}"}, {method: "POST", path: "/v1/webhook/audit/{auditWebhookId}/resend"}} {
 		if parameterNames(root, operation(root, o.method, o.path))["Idempotency-Key"] {
 			t.Errorf("%s passou a aceitar Idempotency-Key — revise o retry do SDK", o.name())
 		}

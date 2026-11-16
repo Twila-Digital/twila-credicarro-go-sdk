@@ -102,6 +102,27 @@ func simulationTypeFromName(name string) SimulationType {
 	}
 }
 
+// CommissionReturnTarget indica a quem a faixa de retorno de comissão se aplica (alvo).
+type CommissionReturnTarget int
+
+// Valores de CommissionReturnTarget.
+const (
+	CommissionReturnTargetUnknown      CommissionReturnTarget = -1
+	CommissionReturnTargetStore        CommissionReturnTarget = 1
+	CommissionReturnTargetOrganization CommissionReturnTarget = 2
+)
+
+func commissionReturnTargetFromName(name string) CommissionReturnTarget {
+	switch strings.ToLower(strings.TrimSpace(name)) {
+	case "store":
+		return CommissionReturnTargetStore
+	case "organization":
+		return CommissionReturnTargetOrganization
+	default:
+		return CommissionReturnTargetUnknown
+	}
+}
+
 // ProposalStep é a etapa de um participante da proposta (enum_etapa / etapa).
 type ProposalStep int
 
