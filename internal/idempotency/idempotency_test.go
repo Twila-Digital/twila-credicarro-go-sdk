@@ -23,6 +23,8 @@ func TestRequiresKey(t *testing.T) {
 		{"POST", "v1/proposal", true},
 		{"POST", "v2/proposal", true},
 		{"POST", "v2/proposal/" + id + "/document", true},
+		{"POST", "v1/proposal/simulation/financing/without-cpf", false},
+		{"POST", "v1/proposal/simulation/refinancing/without-cpf", false},
 		{"POST", "v1/customer/unified", false},
 		{"POST", "v1/webhook", false},
 		{"POST", "v1/authentication/accesstoken", false},

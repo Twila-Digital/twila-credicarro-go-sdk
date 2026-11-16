@@ -274,7 +274,9 @@ var operations = []op{
 	{method: "GET", path: "/v1/proposal/simulation/range/financing", responses: map[string]interface{}{"200": wire.FinancingRangeResponse{}}, query: []string{"placa"}},
 	{method: "GET", path: "/v1/proposal/simulation/range/refinancing", responses: map[string]interface{}{"200": wire.RefinancingRangeResponse{}}, query: []string{"placa"}},
 	{method: "POST", path: "/v1/proposal/simulation/financing", request: wire.FinancingSimulationRequestV1{}, responses: map[string]interface{}{"201": wire.SimulationListResponse{}}, idempotency: true},
+	{method: "POST", path: "/v1/proposal/simulation/financing/without-cpf", request: wire.FinancingWithoutCpfRequest{}, responses: map[string]interface{}{"200": wire.FinancingWithoutCpfResponse{}}},
 	{method: "POST", path: "/v1/proposal/simulation/refinancing", request: wire.RefinancingSimulationRequestV1{}, responses: map[string]interface{}{"201": wire.SimulationListResponse{}}, idempotency: true},
+	{method: "POST", path: "/v1/proposal/simulation/refinancing/without-cpf", request: wire.RefinancingWithoutCpfRequest{}, responses: map[string]interface{}{"200": wire.RefinancingWithoutCpfResponse{}}},
 	{method: "GET", path: "/v1/proposal/simulation/{simulacaoId}", responses: map[string]interface{}{"200": wire.Simulation{}}},
 	{method: "GET", path: "/v1/proposal/simulation", responses: map[string]interface{}{"200": wire.PagedSimulations{}}, query: []string{"pagina_inicial", "limite"}},
 
