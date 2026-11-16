@@ -127,13 +127,14 @@ type RefinancingRangeResponse struct {
 
 // FinancingSimulationRequest é a requisição v2 (com cnpjLoja).
 type FinancingSimulationRequest struct {
-	Cpf           string  `json:"cpf"`
-	LicensePlate  string  `json:"placa"`
-	VehicleAmount float64 `json:"valorVeiculo"`
-	DownPayment   float64 `json:"valorEntrada"`
-	State         string  `json:"uf"`
-	IsZeroKm      bool    `json:"isVeiculoZeroKm"`
-	StoreCnpj     string  `json:"cnpjLoja"`
+	Cpf              string  `json:"cpf"`
+	LicensePlate     string  `json:"placa"`
+	VehicleAmount    float64 `json:"valorVeiculo"`
+	DownPayment      float64 `json:"valorEntrada"`
+	State            string  `json:"uf"`
+	IsZeroKm         bool    `json:"isVeiculoZeroKm"`
+	StoreCnpj        string  `json:"cnpjLoja"`
+	CommissionReturn *int    `json:"retornoComissao,omitempty"`
 }
 
 // FinancingSimulationRequestV1 é a requisição v1 (sem cnpjLoja).
@@ -148,10 +149,23 @@ type FinancingSimulationRequestV1 struct {
 
 // RefinancingSimulationRequest é a requisição v2 (com cnpjLoja).
 type RefinancingSimulationRequest struct {
-	Cpf             string  `json:"cpf"`
-	LicensePlate    string  `json:"placa"`
-	RequestedAmount float64 `json:"valorSolicitado"`
-	StoreCnpj       string  `json:"cnpjLoja"`
+	Cpf              string  `json:"cpf"`
+	LicensePlate     string  `json:"placa"`
+	RequestedAmount  float64 `json:"valorSolicitado"`
+	StoreCnpj        string  `json:"cnpjLoja"`
+	CommissionReturn *int    `json:"retornoComissao,omitempty"`
+}
+
+type CommissionReturn struct {
+	Type              string `json:"tipo"`
+	Target            string `json:"alvo"`
+	MinimumReturn     int    `json:"retorno_minimo"`
+	MaximumReturn     int    `json:"retorno_maximo"`
+	AllowsDefaultRate bool   `json:"permite_taxa_padrao"`
+}
+
+type CommissionReturnsResponse struct {
+	Items []CommissionReturn `json:"retornos_comissao"`
 }
 
 // RefinancingSimulationRequestV1 é a requisição v1 (sem cnpjLoja).
@@ -386,6 +400,26 @@ type Webhook struct {
 type PagedWebhooks struct {
 	Items []Webhook `json:"itens"`
 	Page  Page      `json:"pagina"`
+}
+
+type WebhookDelivery struct {
+	AuditID    string  `json:"id_auditoria"`
+	WebhookID  *string `json:"id_webhook"`
+	Type       string  `json:"tipo"`
+	Request    string  `json:"requisicao"`
+	Response   string  `json:"resposta"`
+	StatusCode *int    `json:"status_http"`
+	CreatedAt  string  `json:"data_criacao"`
+}
+
+type PagedWebhookDeliveries struct {
+	Items []WebhookDelivery `json:"itens"`
+	Page  Page              `json:"pagina"`
+}
+
+type WebhookResendResponse struct {
+	StatusCode *int   `json:"status_http"`
+	Response   string `json:"resposta"`
 }
 
 // ProposalWebhookEvent é o payload de notificação de proposta. Aceita o formato v1
